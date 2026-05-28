@@ -18,6 +18,9 @@ env/
 # Data — large files, download separately
 data/hirise/*
 !data/hirise/.gitkeep
+data/hirise-map-mars-nasa-image/
+data/hirise-map-mars-nasa-image.zip
+data/reorganize.py
 
 # Training outputs
 checkpoints/

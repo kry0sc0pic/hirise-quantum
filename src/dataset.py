@@ -8,15 +8,15 @@ import torch
 from torch.utils.data import Dataset
 from torchvision import transforms
 
-# Visually confusable class pairs — used for hard negative mining
+# Visually confusable class pairs — used for hard negative mining.
+# Names match the actual dataset folder names (spaces → underscores).
+# bright_dune ↔ dark_dune: both are dune formations, differ mainly in albedo.
+# spider ↔ swiss_cheese: both are irregular surface pitting, hard to distinguish.
 CONFUSABLE_PAIRS: Dict[str, str] = {
-    "bright_dunes": "dunes",
-    "dunes": "bright_dunes",
-    "spiders": "swiss_cheese",
-    "swiss_cheese": "spiders",
-    # HiRISE dataset may use slightly different folder names
-    "bright dunes": "dunes",
-    "swiss cheese": "spiders",
+    "bright_dune":  "dark_dune",
+    "dark_dune":    "bright_dune",
+    "spider":       "swiss_cheese",
+    "swiss_cheese": "spider",
 }
 
 HARD_NEGATIVE_FRACTION = 0.5
