@@ -15,6 +15,7 @@ Key design choices:
 from __future__ import annotations
 
 import argparse
+import csv
 import os
 from collections import deque
 from typing import Optional
@@ -34,6 +35,13 @@ try:
     _WANDB = True
 except ImportError:
     _WANDB = False
+
+try:
+    from torch.utils.tensorboard import SummaryWriter
+    _TENSORBOARD = True
+except ImportError:
+    SummaryWriter = None
+    _TENSORBOARD = False
 
 # ── Barren-plateau constants ──────────────────────────────────────────────────
 _BP_THRESHOLD = 1e-5   # mean |grad| below this → plateau
@@ -116,6 +124,8 @@ def train(
     lr_pqc: float = 1e-2,
     val_fraction: float = 0.15,
     checkpoint_dir: str = "checkpoints",
+    metrics_csv: Optional[str] = None,
+    tensorboard_log_dir: Optional[str] = None,
     wandb_project: Optional[str] = None,
     device_str: str = "cpu",
 ) -> None:
@@ -146,6 +156,23 @@ def train(
         {"params": pqc_params,  "lr": lr_pqc},
         {"params": post_params, "lr": lr_cnn},
     ])
+
+    # CSV logging is dependency-free and convenient for paper plots.
+    metrics_csv = metrics_csv or os.path.join(checkpoint_dir, "train_metrics.csv")
+    os.makedirs(os.path.dirname(metrics_csv) or ".", exist_ok=True)
+    with open(metrics_csv, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(
+            f,
+            fieldnames=["epoch", "loss", "val_acc", "q_grad_norm", "cobyla"],
+        )
+        writer.writeheader()
+
+    tb_writer = None
+    if tensorboard_log_dir:
+        if _TENSORBOARD and SummaryWriter is not None:
+            tb_writer = SummaryWriter(log_dir=tensorboard_log_dir)
+        else:
+            print("TensorBoard is not installed; skipping TensorBoard logging.")
 
     # ── W&B ───────────────────────────────────────────────────────────────────
     if _WANDB and wandb_project:
@@ -250,6 +277,23 @@ def train(
                 "q_grad_norm": avg_q_grad, "cobyla": int(use_cobyla),
             })
 
+        row = {
+            "epoch": epoch,
+            "loss": avg_loss,
+            "val_acc": val_acc,
+            "q_grad_norm": avg_q_grad,
+            "cobyla": int(use_cobyla),
+        }
+        with open(metrics_csv, "a", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=list(row.keys()))
+            writer.writerow(row)
+
+        if tb_writer is not None:
+            tb_writer.add_scalar("train/loss", avg_loss, epoch)
+            tb_writer.add_scalar("val/accuracy_proxy", val_acc, epoch)
+            tb_writer.add_scalar("quantum/q_grad_norm", avg_q_grad, epoch)
+            tb_writer.add_scalar("quantum/cobyla", int(use_cobyla), epoch)
+
         # ── Checkpoint ────────────────────────────────────────────────────
         if val_acc > best_val:
             best_val = val_acc
@@ -264,8 +308,11 @@ def train(
             }, ckpt_path)
 
     print(f"\nTraining complete. Best val_acc = {best_val:.4f}")
+    print(f"Training metrics CSV saved to {metrics_csv}")
     if _WANDB and wandb_project:
         wandb.finish()
+    if tb_writer is not None:
+        tb_writer.close()
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
@@ -281,6 +328,8 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--lr_cnn", type=float, default=1e-3)
     p.add_argument("--lr_pqc", type=float, default=1e-2)
     p.add_argument("--checkpoint_dir", default="checkpoints")
+    p.add_argument("--metrics_csv", default=None)
+    p.add_argument("--tensorboard_log_dir", default=None)
     p.add_argument("--wandb_project", default=None)
     p.add_argument("--device", default="cpu")
     return p.parse_args()
@@ -298,6 +347,8 @@ if __name__ == "__main__":
         lr_cnn=args.lr_cnn,
         lr_pqc=args.lr_pqc,
         checkpoint_dir=args.checkpoint_dir,
+        metrics_csv=args.metrics_csv,
+        tensorboard_log_dir=args.tensorboard_log_dir,
         wandb_project=args.wandb_project,
         device_str=args.device,
     )
