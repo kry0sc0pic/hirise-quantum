@@ -4,6 +4,7 @@ Evaluation pipeline for QuantumTerrainSimilarity.
 Metrics:
   - MAP@10 (primary retrieval metric)
   - Recall@1, Recall@5
+  - Precision@1, Precision@5, Precision@10
   - Confusion matrix on hard pairs (bright_dunes/dunes, spiders/swiss_cheese)
 
 Plots:
@@ -18,6 +19,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import csv
 import os
 from typing import Dict, List, Optional, Tuple
 
@@ -133,6 +135,23 @@ def recall_at_k(
         if (labels[top_k] == labels[i]).any():
             hits += 1
     return hits / N
+
+
+def precision_at_k(
+    embeddings: np.ndarray,
+    labels: np.ndarray,
+    k: int,
+) -> float:
+    """Precision@K: average same-class fraction among each query's top-K results."""
+    sim = _cosine_similarity_matrix(embeddings)
+    N = len(labels)
+    scores = []
+    for i in range(N):
+        row = sim[i].copy()
+        row[i] = -np.inf
+        top_k = np.argsort(row)[::-1][:k]
+        scores.append(float((labels[top_k] == labels[i]).mean()))
+    return float(np.mean(scores))
 
 
 # ── Plots ─────────────────────────────────────────────────────────────────────
@@ -277,11 +296,32 @@ def evaluate_model(
     map10 = mean_average_precision(embeddings, labels, k=10)
     r1 = recall_at_k(embeddings, labels, k=1)
     r5 = recall_at_k(embeddings, labels, k=5)
+    p1 = precision_at_k(embeddings, labels, k=1)
+    p5 = precision_at_k(embeddings, labels, k=5)
+    p10 = precision_at_k(embeddings, labels, k=10)
 
     print(f"\n── Retrieval Metrics ──────────────────")
     print(f"MAP@10    : {map10:.4f}")
     print(f"Recall@1  : {r1:.4f}")
     print(f"Recall@5  : {r5:.4f}")
+    print(f"Precision@1 : {p1:.4f}")
+    print(f"Precision@5 : {p5:.4f}")
+    print(f"Precision@10: {p10:.4f}")
+
+    metrics = {
+        "map10": map10,
+        "recall@1": r1,
+        "recall@5": r5,
+        "precision@1": p1,
+        "precision@5": p5,
+        "precision@10": p10,
+    }
+    metrics_csv = os.path.join(output_dir, "metrics.csv")
+    with open(metrics_csv, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=list(metrics.keys()))
+        writer.writeheader()
+        writer.writerow(metrics)
+    print(f"Metrics CSV saved to {metrics_csv}")
 
     plot_umap(
         embeddings, labels, class_names,
@@ -300,7 +340,7 @@ def evaluate_model(
         save_path=os.path.join(output_dir, "confusion_hard_pairs.png"),
     )
 
-    return {"map10": map10, "recall@1": r1, "recall@5": r5}
+    return metrics
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
