@@ -50,3 +50,9 @@ Thumbs.db
 # Env files
 .env
 .env.*
+
+
+# paper
+paper/main.log
+paper/main.aux
+paper/main.out
