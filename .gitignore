@@ -23,8 +23,8 @@ data/hirise-map-mars-nasa-image.zip
 data/reorganize.py
 
 # Training outputs
-checkpoints/
-eval_outputs/
+#checkpoints/
+#eval_outputs/
 
 # Weights & Biases
 wandb/
