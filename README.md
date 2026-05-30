@@ -181,7 +181,7 @@ Results are written to `eval_outputs/metrics_quantum.csv`.
 python -m scripts.make_splits --data_root data/hirise --output_dir data/splits --seed 42
 ```
 
-This creates `data/splits/train.json`, `val.json`, and `test.json`. Each file is a JSON object mapping class names to lists of absolute image paths. The split is stratified: every class is split 70/15/15 independently, so minority classes (spider: 476, impact\_ejecta: 231) appear in all three sets.
+This creates `data/splits/train.json`, `val.json`, and `test.json`. Each file is a JSON object mapping class names to lists of **relative POSIX paths** (forward slashes, relative to `data_root`) — the format is portable across Windows, Linux, and macOS. Paths are resolved back to absolute paths at load time by passing `--data_root` to the training and eval scripts. The split is stratified: every class is split 70/15/15 independently, so minority classes (spider: 476, impact\_ejecta: 231) appear in all three sets.
 
 **Always use the same `--seed` across all training runs** so every model sees the same train/val/test partition.
 
@@ -463,6 +463,10 @@ Evaluates a saved checkpoint on retrieval metrics.
 ### `python -m scripts.make_splits`
 
 Creates stratified splits. Run once before any training.
+
+Paths are stored relative to `data_root` using forward slashes (POSIX style) so
+the same JSON files work on Windows, Linux, and macOS. The training and eval
+scripts resolve them back to absolute paths automatically via `--data_root`.
 
 | Argument | Default | Description |
 |----------|---------|-------------|

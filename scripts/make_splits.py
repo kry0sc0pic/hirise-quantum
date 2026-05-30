@@ -3,7 +3,12 @@ Creates stratified 70/15/15 train/val/test splits for HiRISE data.
 
 Each class is split independently so minority classes appear in all three sets.
 Output: data/splits/train.json, val.json, test.json
-Format:  {"class_name": ["/abs/path/to/img1.jpg", ...], ...}
+
+Paths in the JSON are stored RELATIVE to data_root using forward slashes (POSIX
+style) so the files are portable across Windows, Linux, and macOS. They are
+resolved back to absolute paths at load time by load_split(file, data_root).
+
+Format:  {"class_name": ["bright_dune/img1.jpg", ...], ...}
 
 Usage:
     python -m scripts.make_splits --data_root data/hirise
@@ -16,10 +21,16 @@ import argparse
 import json
 import os
 import random
+from pathlib import Path, PurePosixPath
 
 from src.dataset import build_class_index
 
 SPLIT_RATIOS = (0.70, 0.15, 0.15)
+
+
+def _to_posix_rel(abs_path: str, data_root_abs: Path) -> str:
+    """Return a forward-slash path relative to data_root — portable across OSes."""
+    return str(PurePosixPath(Path(abs_path).resolve().relative_to(data_root_abs)))
 
 
 def make_splits(
@@ -31,6 +42,7 @@ def make_splits(
     random.seed(seed)
     os.makedirs(output_dir, exist_ok=True)
 
+    data_root_abs = Path(data_root).resolve()
     class_index = build_class_index(data_root)
     if not class_index:
         raise ValueError(f"No class directories found under {data_root}")
@@ -53,9 +65,10 @@ def make_splits(
         if n_test < 1 and n >= 3:
             n_val -= 1
             n_test = 1
-        train_split[cls] = shuffled[:n_train]
-        val_split[cls] = shuffled[n_train:n_train + n_val]
-        test_split[cls] = shuffled[n_train + n_val:]
+        # Store as POSIX relative paths so the JSON is portable across OSes
+        train_split[cls] = [_to_posix_rel(p, data_root_abs) for p in shuffled[:n_train]]
+        val_split[cls]   = [_to_posix_rel(p, data_root_abs) for p in shuffled[n_train:n_train + n_val]]
+        test_split[cls]  = [_to_posix_rel(p, data_root_abs) for p in shuffled[n_train + n_val:]]
         print(f"  {cls:20s}: {len(train_split[cls]):5d} train  "
               f"{len(val_split[cls]):4d} val  {len(test_split[cls]):4d} test")
 

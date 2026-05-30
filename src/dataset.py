@@ -51,10 +51,23 @@ def build_class_index(root: str) -> Dict[str, List[str]]:
     return idx
 
 
-def load_split(split_file: str) -> Dict[str, List[str]]:
-    """Load a pre-computed split JSON ({class_name: [path, ...]}) from disk."""
+def load_split(split_file: str, data_root: Optional[str] = None) -> Dict[str, List[str]]:
+    """Load a pre-computed split JSON and return absolute paths.
+
+    Paths in the JSON are stored as POSIX-relative (forward-slash, relative to
+    data_root) by make_splits.py.  Pass data_root to resolve them to absolute
+    paths on the current OS — required for cross-platform portability.
+    If data_root is None, paths are returned as-is (backward compat only).
+    """
     with open(split_file, encoding="utf-8") as f:
-        return json.load(f)
+        data = json.load(f)
+    if data_root is None:
+        return data
+    root = Path(data_root).resolve()
+    return {
+        cls: [str(root / p) for p in paths]
+        for cls, paths in data.items()
+    }
 
 
 class HiRISETripletDataset(Dataset):
@@ -79,7 +92,7 @@ class HiRISETripletDataset(Dataset):
     ):
         self.hard_negative_fraction = hard_negative_fraction
         self.class_index = (
-            load_split(split_file) if split_file else build_class_index(root)
+            load_split(split_file, root) if split_file else build_class_index(root)
         )
         if not self.class_index:
             raise ValueError(f"No class directories found under {root}")
@@ -138,7 +151,7 @@ class HiRISEPairDataset(Dataset):
         max_diff_per_pair: int = 30,
         split_file: Optional[str] = None,
     ):
-        class_index = load_split(split_file) if split_file else build_class_index(root)
+        class_index = load_split(split_file, root) if split_file else build_class_index(root)
         self.classes = sorted(class_index.keys())
         self.transform = transform or _angle_encoding_transform()
         self.pairs = self._build_pairs(class_index, max_same_per_class, max_diff_per_pair)

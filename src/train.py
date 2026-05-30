@@ -226,7 +226,7 @@ def train(
     if split_train and split_val:
         train_ds = HiRISETripletDataset(data_root, split_file=split_train)
         val_ds   = HiRISETripletDataset(data_root, split_file=split_val)
-        val_class_index = load_split(split_val)
+        val_class_index = load_split(split_val, data_root)
     else:
         full_ds = HiRISETripletDataset(data_root)
         n_val = max(1, int(len(full_ds) * val_fraction))

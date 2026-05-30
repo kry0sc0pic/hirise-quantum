@@ -68,7 +68,7 @@ class _ImageDataset(Dataset):
     def __init__(self, root: str, transform=None, split_file: Optional[str] = None):
         from src.dataset import _angle_encoding_transform
         self.transform = transform or _angle_encoding_transform()
-        self.class_index = load_split(split_file) if split_file else build_class_index(root)
+        self.class_index = load_split(split_file, root) if split_file else build_class_index(root)
         self.classes = sorted(self.class_index.keys())
         self.samples: List[Tuple[str, int]] = [
             (path, cls_idx)
