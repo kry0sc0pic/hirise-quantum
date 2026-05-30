@@ -51,7 +51,7 @@ _BP_PATIENCE = 5       # consecutive epochs below threshold before switching
 # ── COBYLA fallback ───────────────────────────────────────────────────────────
 
 def _cobyla_epoch(
-    model: QuantumTerrainSimilarity,
+    model: torch.nn.Module,
     loader: DataLoader,
     device: torch.device,
     margin: float,
@@ -98,7 +98,7 @@ def _cobyla_epoch(
 # ── Validation MAP@10 ─────────────────────────────────────────────────────────
 
 @torch.no_grad()
-def _val_map10(model: QuantumTerrainSimilarity, loader: DataLoader, device: torch.device) -> float:
+def _val_map10(model: torch.nn.Module, loader: DataLoader, device: torch.device) -> float:
     """Approximate MAP@10 on the validation triplet loader (uses sim_ap > sim_an as proxy)."""
     model.eval()
     n_correct = n_total = 0
@@ -128,8 +128,17 @@ def train(
     tensorboard_log_dir: Optional[str] = None,
     wandb_project: Optional[str] = None,
     device_str: str = "cpu",
+    model_type: str = "quantum",
 ) -> None:
+    """
+    model_type: 'quantum' (entangled-pair PQC) or 'sliq' (sequential encoding baseline).
+    For the classical head baseline use baselines.classical_head directly.
+    """
     assert n_qubits <= 12, "Hard cap: n_qubits > 12 requires 2^N statevector — memory unsafe."
+    assert model_type in ("quantum", "sliq"), (
+        f"model_type must be 'quantum' or 'sliq', got {model_type!r}. "
+        "For the classical head use baselines.classical_head."
+    )
 
     device = torch.device(device_str)
     os.makedirs(checkpoint_dir, exist_ok=True)
@@ -144,7 +153,11 @@ def train(
     val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False, num_workers=0)
 
     # ── Model ─────────────────────────────────────────────────────────────────
-    model = QuantumTerrainSimilarity(n_qubits=n_qubits, n_layers=n_layers).to(device)
+    if model_type == "quantum":
+        model = QuantumTerrainSimilarity(n_qubits=n_qubits, n_layers=n_layers).to(device)
+    else:
+        from baselines.sliq_baseline import SLIQTerrainSimilarity
+        model = SLIQTerrainSimilarity(n_qubits=n_qubits, n_layers=n_layers).to(device)
 
     # Separate optimizer groups — quantum weights need a higher LR
     cnn_params = list(model.encoder.parameters())
@@ -158,7 +171,7 @@ def train(
     ])
 
     # CSV logging is dependency-free and convenient for paper plots.
-    metrics_csv = metrics_csv or os.path.join(checkpoint_dir, "train_metrics.csv")
+    metrics_csv = metrics_csv or os.path.join(checkpoint_dir, f"train_metrics_{model_type}.csv")
     os.makedirs(os.path.dirname(metrics_csv) or ".", exist_ok=True)
     with open(metrics_csv, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
@@ -297,7 +310,7 @@ def train(
         # ── Checkpoint ────────────────────────────────────────────────────
         if val_acc > best_val:
             best_val = val_acc
-            ckpt_path = os.path.join(checkpoint_dir, "best_quantum.pt")
+            ckpt_path = os.path.join(checkpoint_dir, f"best_{model_type}.pt")
             torch.save({
                 "epoch": epoch,
                 "model_state": model.state_dict(),
@@ -305,9 +318,10 @@ def train(
                 "n_qubits": n_qubits,
                 "n_layers": n_layers,
                 "q_grad_history": q_grad_history,
+                "model_type": model_type,
             }, ckpt_path)
 
-    print(f"\nTraining complete. Best val_acc = {best_val:.4f}")
+    print(f"\n[{model_type}] Training complete. Best val_acc = {best_val:.4f}")
     print(f"Training metrics CSV saved to {metrics_csv}")
     if _WANDB and wandb_project:
         wandb.finish()
@@ -332,6 +346,9 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--tensorboard_log_dir", default=None)
     p.add_argument("--wandb_project", default=None)
     p.add_argument("--device", default="cpu")
+    p.add_argument("--model_type", default="quantum", choices=["quantum", "sliq"],
+                   help="'quantum' (entangled-pair PQC) or 'sliq' (sequential encoding). "
+                        "For classical head use: python -m baselines.classical_head")
     return p.parse_args()
 
 
@@ -351,4 +368,5 @@ if __name__ == "__main__":
         tensorboard_log_dir=args.tensorboard_log_dir,
         wandb_project=args.wandb_project,
         device_str=args.device,
+        model_type=args.model_type,
     )

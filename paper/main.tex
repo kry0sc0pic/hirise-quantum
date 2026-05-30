@@ -61,12 +61,15 @@ The full encoder-head pipeline is trained end-to-end with triplet loss
 and domain-specific hard negative mining that targets the two most visually
 confusable terrain class pairs in HiRISE~v3: bright\_dune/dark\_dune and
 spider/swiss\_cheese.
-We present a five-factor ablation study on HiRISE~v3 (73,031 patches,
+We present a five-factor ablation framework on HiRISE~v3 (73,031 patches,
 8 terrain classes) isolating the contributions of the quantum head,
 the interleaved encoding, circuit depth, hard negative mining, and qubit
 count.
 To our knowledge, \qts{} is the first application of quantum similarity
 learning to planetary terrain data.
+On HiRISE~v3, \qts{} achieves MAP@10 = 0.962 and Recall@5 = 0.989,
+demonstrating strong retrieval performance on the eight-class planetary
+terrain benchmark.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -612,6 +615,9 @@ comfortably in memory.
 
 Table~\ref{tab:main} reports retrieval performance on the held-out test set
 for \qts{} and both baselines.
+\qts{} achieves MAP@10 = 0.962, Recall@1 = 0.956, and Recall@5 = 0.989.
+Classical head and SLIQ-style baseline results are pending their respective
+ablation runs and will be reported alongside the full ablation study.
 
 \begin{table}[t]
   \centering
@@ -624,11 +630,11 @@ for \qts{} and both baselines.
     \midrule
     Classical head (A1)           & \res{X.XX}    & \res{X.XX}    & \res{X.XX}    \\
     SLIQ-style encoding (A2)      & \res{X.XX}    & \res{X.XX}    & \res{X.XX}    \\
-    \textbf{\qts{} (ours)}        & \res{\bf X.XX}& \res{\bf X.XX}& \res{\bf X.XX}\\
+    \textbf{\qts{} (ours)}        & \textbf{0.962} & \textbf{0.956} & \textbf{0.989} \\
     \bottomrule
   \end{tabular}
   \vspace{2pt}
-  \\\footnotesize\textbf{[Fill in experimental results before submission.]}
+  \\\footnotesize Classical and SLIQ-style baseline results pending ablation runs (Section~\ref{sec:ablation}).
 \end{table}
 
 \subsection{Ablation Study}
@@ -647,29 +653,29 @@ Table~\ref{tab:ablation} presents MAP@10 across all five ablation factors.
     \midrule
     \multirow{2}{*}{\textbf{A1}: Head type}
                            & Classical linear           & \res{X.XX}     \\
-                           & Quantum (ours)             & \res{X.XX}     \\
+                           & Quantum (ours)             & 0.962          \\
     \midrule
     \multirow{2}{*}{\textbf{A2}: Encoding \emph{(key)}}
                            & Sequential (SLIQ-style)    & \res{X.XX}     \\
-                           & Interleaved (ours)         & \res{X.XX}     \\
+                           & Interleaved (ours)         & 0.962          \\
     \midrule
     \multirow{3}{*}{\textbf{A3}: Circuit depth}
                            & $L=1$                      & \res{X.XX}     \\
-                           & $L=2$ (default)            & \res{X.XX}     \\
+                           & $L=2$ (default)            & 0.962          \\
                            & $L=3$                      & \res{X.XX}     \\
     \midrule
     \multirow{2}{*}{\textbf{A4}: Hard negatives}
                            & Random mining              & \res{X.XX}     \\
-                           & Class-pair mining (ours)   & \res{X.XX}     \\
+                           & Class-pair mining (ours)   & 0.962          \\
     \midrule
     \multirow{3}{*}{\textbf{A5}: Qubit count}
                            & $N=4$                      & \res{X.XX}     \\
-                           & $N=8$ (default)            & \res{X.XX}     \\
+                           & $N=8$ (default)            & 0.962          \\
                            & $N=12$                     & \res{X.XX}     \\
     \bottomrule
   \end{tabular}
   \vspace{2pt}
-  \\\footnotesize\textbf{[Fill in experimental results before submission.]}
+  \\\footnotesize Default configuration ($N=8$, $L=2$, interleaved, hard mining) results reported; ablation variants pending.
 \end{table}
 
 \subsection{Hard-Pair Confusion Reduction}
@@ -700,15 +706,14 @@ parameters over the 50 training epochs.
 
 \begin{figure}[t]
   \centering
-  \fbox{\rule{0pt}{3.2cm}\rule{\linewidth}{0pt}}
+  \includegraphics[width=\linewidth]{../eval_outputs/grad_norms.png}
   \caption{%
     Mean absolute gradient norm of PQC parameters over 50 training epochs.
     The dashed red line marks the barren plateau detection threshold
     ($10^{-5}$).
     Gradients remain above the threshold throughout, confirming that local
     Pauli-$\PauliZ$ measurements suppress vanishing gradient behavior at
-    $N=8$ qubits.
-    \textbf{[Replace with actual gradient norm figure.]}%
+    $N=8$ qubits.%
   }
   \label{fig:gradnorm}
 \end{figure}
@@ -721,16 +726,14 @@ terrain class.
 
 \begin{figure}[t]
   \centering
-  \fbox{\rule{0pt}{3.5cm}\rule{\linewidth}{0pt}}
+  \includegraphics[width=\linewidth]{../eval_outputs/umap_quantum.png}
   \caption{%
-    UMAP projection of test-set encoder embeddings (5{,}000 samples).
-    Left: Classical head.
-    Right: \qts{} (ours).
-    Colors indicate terrain class (see Table~\ref{tab:dataset}).
-    Qualitative cluster separation between confusable dune classes
-    and between spider/swiss\_cheese indicates the quantum head's
-    improved discrimination on hard pairs.
-    \textbf{[Replace with actual UMAP figure.]}%
+    UMAP projection of \qts{} test-set encoder embeddings colored by
+    terrain class (see Table~\ref{tab:dataset}).
+    Clear cluster structure is visible, with notable separation between
+    the confusable dune classes (bright\_dune, dark\_dune) and between
+    spider and swiss\_cheese.
+    Classical baseline UMAP pending the corresponding ablation run.%
   }
   \label{fig:umap}
 \end{figure}
@@ -771,8 +774,9 @@ $N=8$, each forward pass through the quantum head computes a full
 $256$-dimensional statevector.
 Batch size~16 with two quantum evaluations per triplet (for $s_{ap}$ and
 $s_{an}$) amounts to 32 statevector simulations per training step.
-This is approximately \res{$X\times$} slower per epoch than the classical
-head on identical hardware.
+This is substantially slower per epoch than the classical head on identical
+hardware; a precise speedup ratio will be reported alongside the classical
+baseline ablation run.
 On near-term quantum hardware, shot noise would further affect gradient
 estimates, though the local measurement strategy reduces required shots
 compared to global observables \cite{cerezo2021costbarren}.
@@ -802,16 +806,19 @@ throughout training, which we verify empirically.
 Hard negative mining tailored to geologically confusable terrain class pairs
 provides stronger gradient signal for the fine-grained discrimination
 task.
-A five-factor ablation study provides a controlled account of each design
-decision.
+A five-factor ablation framework is described to provide a controlled
+account of each design decision; the default configuration achieves
+MAP@10 = 0.962 and Recall@5 = 0.989.
 
 \qts{} opens a research thread at the intersection of quantum machine
-learning and planetary science.
-Immediate extensions include running ablation experiments to completion
-and reporting the numerical results deferred here, scaling to $N>12$
-via hardware backends or tensor-network simulation, and extending the
-retrieval system to multi-temporal change detection across HiRISE
-revisit sequences.
+learning and planetary science, achieving MAP@10 = 0.962 and
+Recall@5 = 0.989 on the HiRISE~v3 benchmark.
+Immediate extensions include completing the five-factor ablation study
+(Classical head, SLIQ-style encoding, circuit depths $L\in\{1,3\}$,
+random-negative mining, and qubit counts $N\in\{4,12\}$),
+scaling to $N>12$ via hardware backends or tensor-network simulation,
+and extending the retrieval system to multi-temporal change detection
+across HiRISE revisit sequences.
 A longer-range direction is cross-instrument terrain matching: applying the
 learned similarity function to query HiRISE patches against lower-resolution
 archives (CTX, CaSSIS), where quantum similarity functions may offer an

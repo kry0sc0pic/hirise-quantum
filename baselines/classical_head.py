@@ -13,7 +13,9 @@ from __future__ import annotations
 from typing import Optional, Tuple
 
 import argparse
+import csv
 import os
+from typing import Optional
 
 import torch
 import torch.nn as nn
@@ -79,6 +81,7 @@ def train_classical(
     lr: float = 1e-3,
     val_fraction: float = 0.15,
     checkpoint_dir: str = "checkpoints",
+    metrics_csv: Optional[str] = None,
     device_str: str = "cpu",
 ) -> None:
     device = torch.device(device_str)
@@ -92,6 +95,11 @@ def train_classical(
 
     model = ClassicalTerrainSimilarity(n_qubits=n_qubits).to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
+
+    metrics_csv = metrics_csv or os.path.join(checkpoint_dir, "train_metrics_classical.csv")
+    with open(metrics_csv, "w", newline="", encoding="utf-8") as f:
+        csv.DictWriter(f, fieldnames=["epoch", "loss", "val_acc"]).writeheader()
+
     best_val = 0.0
 
     for epoch in range(1, epochs + 1):
@@ -118,12 +126,26 @@ def train_classical(
         avg_loss = epoch_loss / max(len(train_loader), 1)
         print(f"Epoch {epoch:3d} | loss {avg_loss:.4f} | val_acc {val_acc:.4f}")
 
+        with open(metrics_csv, "a", newline="", encoding="utf-8") as f:
+            csv.DictWriter(f, fieldnames=["epoch", "loss", "val_acc"]).writerow(
+                {"epoch": epoch, "loss": avg_loss, "val_acc": val_acc}
+            )
+
         if val_acc > best_val:
             best_val = val_acc
-            torch.save({"epoch": epoch, "model_state": model.state_dict(), "val_acc": val_acc},
-                       os.path.join(checkpoint_dir, "best_classical.pt"))
+            torch.save(
+                {
+                    "epoch": epoch,
+                    "model_state": model.state_dict(),
+                    "val_acc": val_acc,
+                    "n_qubits": n_qubits,
+                    "model_type": "classical",
+                },
+                os.path.join(checkpoint_dir, "best_classical.pt"),
+            )
 
-    print(f"Classical baseline best val_acc = {best_val:.4f}")
+    print(f"[classical] Training complete. Best val_acc = {best_val:.4f}")
+    print(f"Training metrics CSV saved to {metrics_csv}")
 
 
 if __name__ == "__main__":
@@ -132,6 +154,10 @@ if __name__ == "__main__":
     p.add_argument("--epochs", type=int, default=50)
     p.add_argument("--batch_size", type=int, default=32)
     p.add_argument("--n_qubits", type=int, default=N_QUBITS)
+    p.add_argument("--metrics_csv", default=None)
     p.add_argument("--device", default="cpu")
     args = p.parse_args()
-    train_classical(args.data_root, args.epochs, args.batch_size, args.n_qubits, device_str=args.device)
+    train_classical(
+        args.data_root, args.epochs, args.batch_size, args.n_qubits,
+        metrics_csv=args.metrics_csv, device_str=args.device,
+    )

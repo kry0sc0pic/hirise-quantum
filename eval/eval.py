@@ -36,6 +36,19 @@ from src.model import QuantumTerrainSimilarity
 from src.quantum_head import N_LAYERS, N_QUBITS
 
 
+def _make_model(model_type: str, n_qubits: int, n_layers: int) -> torch.nn.Module:
+    if model_type == "quantum":
+        return QuantumTerrainSimilarity(n_qubits=n_qubits, n_layers=n_layers)
+    elif model_type == "classical":
+        from baselines.classical_head import ClassicalTerrainSimilarity
+        return ClassicalTerrainSimilarity(n_qubits=n_qubits)
+    elif model_type == "sliq":
+        from baselines.sliq_baseline import SLIQTerrainSimilarity
+        return SLIQTerrainSimilarity(n_qubits=n_qubits, n_layers=n_layers)
+    else:
+        raise ValueError(f"Unknown model_type: {model_type!r}. Choose quantum | classical | sliq.")
+
+
 # ── Embedding extraction ──────────────────────────────────────────────────────
 
 class _ImageDataset(Dataset):
@@ -277,16 +290,22 @@ def evaluate_model(
     checkpoint_path: str,
     data_root: str,
     output_dir: str = "eval_outputs",
+    model_type: Optional[str] = None,
     device_str: str = "cpu",
 ) -> Dict[str, float]:
+    """
+    model_type: 'quantum' | 'classical' | 'sliq'.
+    If None, inferred from the 'model_type' key saved in the checkpoint.
+    """
     os.makedirs(output_dir, exist_ok=True)
     device = torch.device(device_str)
 
-    ckpt = torch.load(checkpoint_path, map_location=device)
+    ckpt = torch.load(checkpoint_path, map_location=device, weights_only=False)
     n_qubits = ckpt.get("n_qubits", N_QUBITS)
     n_layers = ckpt.get("n_layers", N_LAYERS)
+    model_type = model_type or ckpt.get("model_type", "quantum")
 
-    model = QuantumTerrainSimilarity(n_qubits=n_qubits, n_layers=n_layers)
+    model = _make_model(model_type, n_qubits, n_layers)
     model.load_state_dict(ckpt["model_state"])
 
     embeddings, labels, class_names = compute_embeddings(
@@ -316,7 +335,7 @@ def evaluate_model(
         "precision@5": p5,
         "precision@10": p10,
     }
-    metrics_csv = os.path.join(output_dir, "metrics.csv")
+    metrics_csv = os.path.join(output_dir, f"metrics_{model_type}.csv")
     with open(metrics_csv, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=list(metrics.keys()))
         writer.writeheader()
@@ -325,19 +344,19 @@ def evaluate_model(
 
     plot_umap(
         embeddings, labels, class_names,
-        title="Quantum Model — UMAP Terrain Embeddings",
-        save_path=os.path.join(output_dir, "umap_quantum.png"),
+        title=f"{model_type.upper()} Model — UMAP Terrain Embeddings",
+        save_path=os.path.join(output_dir, f"umap_{model_type}.png"),
     )
 
     if "q_grad_history" in ckpt and ckpt["q_grad_history"]:
         plot_gradient_norms(
             ckpt["q_grad_history"],
-            save_path=os.path.join(output_dir, "grad_norms.png"),
+            save_path=os.path.join(output_dir, f"grad_norms_{model_type}.png"),
         )
 
     plot_hard_pair_confusion(
         embeddings, labels, class_names,
-        save_path=os.path.join(output_dir, "confusion_hard_pairs.png"),
+        save_path=os.path.join(output_dir, f"confusion_hard_pairs_{model_type}.png"),
     )
 
     return metrics
@@ -350,6 +369,8 @@ if __name__ == "__main__":
     p.add_argument("--checkpoint", required=True)
     p.add_argument("--data_root", default="data/hirise")
     p.add_argument("--output_dir", default="eval_outputs")
+    p.add_argument("--model_type", default=None, choices=["quantum", "classical", "sliq"],
+                   help="Override model type (default: read from checkpoint)")
     p.add_argument("--device", default="cpu")
     args = p.parse_args()
-    evaluate_model(args.checkpoint, args.data_root, args.output_dir, args.device)
+    evaluate_model(args.checkpoint, args.data_root, args.output_dir, args.model_type, args.device)
