@@ -14,15 +14,25 @@ def build_entangled_pair_layer(
     """
     Builds the core quantum similarity circuit as a PennyLane TorchLayer.
 
-    Encoding: interleaved RX(π·eₐ[i]) + RY(π·e_b[i]) on wire i.
-    This is the key design choice — both embeddings are encoded on the SAME
-    qubits via orthogonal rotation axes, creating entanglement between them.
-    Contrast with sequential encoding used in SLIQ (arXiv:2309.15259), where
-    the two embeddings are encoded independently.
+    Encoding: on wire i, apply RX(π·eₐ[i]) then RY(π·e_b[i]).
+    The encoder's L2-normalization ensures e[i] ∈ [-1, 1], so rotation
+    angles π·e[i] lie in [-π, π] — the natural domain of rotation gates.
+
+    Axis-choice vs SLIQ (arXiv:2309.15259):
+    SLIQ encodes eₐ with RZ rotations on all wires, then e_b with RX rotations
+    on all wires (two separate encoding blocks). Because RZ|0⟩ = e^{-iθ/2}|0⟩
+    differs from |0⟩ only by a global phase, RZ acts as a no-op on the
+    initial |0⟩ state — the first SLIQ encoding block has no effect on
+    the ⟨Z_i⟩ measurement values before the entangling layer. Our choice of
+    RX then RY on the same wire avoids this degeneracy: RX|0⟩ rotates the
+    state away from |0⟩, so both embeddings genuinely affect the pre-ansatz
+    state on each wire. Ablation A2 isolates this axis-choice effect.
 
     Measurements: local PauliZ on each wire (not a single global observable).
-    Local cost functions provably mitigate barren plateaus (Cerezo et al., 2021,
-    Nature Communications 12:6961).
+    Cerezo et al. (2021, Nature Commun. 12:1791) prove that local observables
+    have at-most polynomially vanishing gradients in shallow circuits, whereas
+    global observables yield exponentially vanishing gradients. We adopt local
+    measurements as a design recommendation from that result.
     """
     dev = qml.device("default.qubit", wires=n_qubits)
 

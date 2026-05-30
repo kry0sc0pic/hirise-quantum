@@ -1,3 +1,4 @@
+import json
 import random
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -9,9 +10,8 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 
 # Visually confusable class pairs — used for hard negative mining.
-# Names match the actual dataset folder names (spaces → underscores).
 # bright_dune ↔ dark_dune: both are dune formations, differ mainly in albedo.
-# spider ↔ swiss_cheese: both are irregular surface pitting, hard to distinguish.
+# spider ↔ swiss_cheese: both are CO₂-sublimation features in the south polar region.
 CONFUSABLE_PAIRS: Dict[str, str] = {
     "bright_dune":  "dark_dune",
     "dark_dune":    "bright_dune",
@@ -23,12 +23,15 @@ HARD_NEGATIVE_FRACTION = 0.5
 
 
 def _angle_encoding_transform() -> transforms.Compose:
+    # Standard grayscale normalization: maps pixel values [0, 1] → [-1, 1].
+    # The CNN encoder's final L2-normalization (src/encoder.py) projects
+    # its output onto the unit sphere, so circuit inputs e[i] ∈ [-1, 1].
+    # Rotation gates then receive angles π·e[i] ∈ [-π, π].
     return transforms.Compose([
         transforms.Grayscale(),
         transforms.Resize((64, 64)),
         transforms.ToTensor(),
-        # Map [0,1] → [-π, π] for angle encoding into quantum circuit
-        transforms.Normalize(mean=[0.5], std=[1.0 / (2.0 * np.pi)]),
+        transforms.Normalize(mean=[0.5], std=[0.5]),
     ])
 
 
@@ -48,13 +51,23 @@ def build_class_index(root: str) -> Dict[str, List[str]]:
     return idx
 
 
+def load_split(split_file: str) -> Dict[str, List[str]]:
+    """Load a pre-computed split JSON ({class_name: [path, ...]}) from disk."""
+    with open(split_file, encoding="utf-8") as f:
+        return json.load(f)
+
+
 class HiRISETripletDataset(Dataset):
     """
     Yields (anchor, positive, negative) triplets for metric learning.
 
+    If split_file is provided, loads the class index from that JSON file
+    (produced by scripts/make_splits.py) for reproducible partitioning.
+    Otherwise, scans data_root for an ImageFolder-style layout.
+
     Hard negative mining: HARD_NEGATIVE_FRACTION of negatives are drawn from
-    confusable class pairs (bright_dunes↔dunes, spiders↔swiss_cheese) instead
-    of uniformly at random.
+    confusable class pairs (bright_dune↔dark_dune, spider↔swiss_cheese)
+    instead of uniformly at random.
     """
 
     def __init__(
@@ -62,9 +75,12 @@ class HiRISETripletDataset(Dataset):
         root: str,
         transform: Optional[transforms.Compose] = None,
         hard_negative_fraction: float = HARD_NEGATIVE_FRACTION,
+        split_file: Optional[str] = None,
     ):
         self.hard_negative_fraction = hard_negative_fraction
-        self.class_index = build_class_index(root)
+        self.class_index = (
+            load_split(split_file) if split_file else build_class_index(root)
+        )
         if not self.class_index:
             raise ValueError(f"No class directories found under {root}")
         self.classes = sorted(self.class_index.keys())
@@ -120,31 +136,33 @@ class HiRISEPairDataset(Dataset):
         transform: Optional[transforms.Compose] = None,
         max_same_per_class: int = 150,
         max_diff_per_pair: int = 30,
+        split_file: Optional[str] = None,
     ):
-        self.class_index = build_class_index(root)
-        self.classes = sorted(self.class_index.keys())
+        class_index = load_split(split_file) if split_file else build_class_index(root)
+        self.classes = sorted(class_index.keys())
         self.transform = transform or _angle_encoding_transform()
-        self.pairs = self._build_pairs(max_same_per_class, max_diff_per_pair)
+        self.pairs = self._build_pairs(class_index, max_same_per_class, max_diff_per_pair)
 
     def _build_pairs(
-        self, max_same: int, max_diff: int
+        self,
+        class_index: Dict[str, List[str]],
+        max_same: int,
+        max_diff: int,
     ) -> List[Tuple[str, str, int]]:
         pairs: List[Tuple[str, str, int]] = []
-        classes = self.classes
+        classes = sorted(class_index.keys())
 
         for cls in classes:
-            imgs = self.class_index[cls]
-            # Same-class pairs (consecutive sampling)
+            imgs = class_index[cls]
             shuffled = imgs[:]
             random.shuffle(shuffled)
             for i in range(0, min(max_same * 2, len(shuffled) - 1), 2):
                 pairs.append((shuffled[i], shuffled[i + 1], 1))
 
-            # Different-class pairs
             for other_cls in classes:
                 if other_cls == cls:
                     continue
-                other_imgs = self.class_index[other_cls]
+                other_imgs = class_index[other_cls]
                 n = min(max_diff, len(imgs), len(other_imgs))
                 for a, b in zip(
                     random.sample(imgs, n), random.sample(other_imgs, n)

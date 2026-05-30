@@ -1,16 +1,24 @@
 """
-SLIQ-style baseline (ablation A2).
+SLIQ-style baseline (ablation A2 — axis-choice comparison).
 
-Replicates the SEQUENTIAL encoding approach from SLIQ (arXiv:2309.15259):
-    all of eₐ is encoded first (RZ rotations on all wires),
-    then all of e_b is encoded (RX rotations on all wires).
+Ablation A2 tests whether the axis choice in the encoding layer matters.
+This baseline uses RZ(π·eₐ[i]) then RX(π·e_b[i]) on each wire — matching
+the two-block encoding convention from SLIQ (arXiv:2309.15259).
 
-This is the key contrast with our model, where eₐ[i] and e_b[i] are encoded
-via RX + RY on the SAME wire i — creating entanglement between the two
-embeddings at the encoding stage.
+The key technical asymmetry with our model (src/quantum_head.py):
+    SLIQ:  RZ(α)|0⟩ = e^{-iα/2}|0⟩  — differs from |0⟩ only by a global
+           phase, so ⟨Z_i⟩ is unaffected by α before any entangling gate.
+           The first encoding block (RZ on eₐ) is effectively a no-op
+           for the Z-measurement observables used throughout.
+    Ours:  RX(α)|0⟩ = cos(α/2)|0⟩ - i sin(α/2)|1⟩ — genuinely rotates
+           the state, so eₐ does contribute to the pre-ansatz state.
 
-Keeping the ansatz (StronglyEntanglingLayers) and measurements (local PauliZ)
-identical isolates the encoding strategy as the sole variable for ablation A2.
+This is NOT a "joint vs sequential" distinction — both schemes apply two
+rotations per wire and produce a joint function of (eₐ, e_b). The difference
+is the choice of rotation axes and the resulting gate degeneracy.
+
+Keeping the ansatz (StronglyEntanglingLayers, depth L) and measurements
+(local PauliZ) identical isolates the axis-choice effect for ablation A2.
 """
 
 from __future__ import annotations
