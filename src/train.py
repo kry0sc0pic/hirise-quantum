@@ -194,6 +194,7 @@ def train(
     split_train: Optional[str] = None,
     split_val: Optional[str] = None,
     val_every: int = 5,
+    hard_negative_fraction: float = 0.5,
 ) -> None:
     """
     Train a quantum or SLIQ terrain similarity model.
@@ -224,11 +225,14 @@ def train(
     val_class_index: Optional[Dict] = None
 
     if split_train and split_val:
-        train_ds = HiRISETripletDataset(data_root, split_file=split_train)
-        val_ds   = HiRISETripletDataset(data_root, split_file=split_val)
+        train_ds = HiRISETripletDataset(data_root, split_file=split_train,
+                                        hard_negative_fraction=hard_negative_fraction)
+        val_ds   = HiRISETripletDataset(data_root, split_file=split_val,
+                                        hard_negative_fraction=hard_negative_fraction)
         val_class_index = load_split(split_val, data_root)
     else:
-        full_ds = HiRISETripletDataset(data_root)
+        full_ds = HiRISETripletDataset(data_root,
+                                       hard_negative_fraction=hard_negative_fraction)
         n_val = max(1, int(len(full_ds) * val_fraction))
         n_train = len(full_ds) - n_val
         train_ds, val_ds = random_split(full_ds, [n_train, n_val])
@@ -446,6 +450,8 @@ def _parse_args() -> argparse.Namespace:
                    help="Path to train.json from scripts/make_splits.py (recommended).")
     p.add_argument("--split_val", default=None,
                    help="Path to val.json from scripts/make_splits.py (recommended).")
+    p.add_argument("--hard_negative_fraction", type=float, default=0.5,
+                   help="Fraction of negatives drawn from confusable class pairs (A4 ablation: set to 0.0 for random mining)")
     p.add_argument("--val_every", type=int, default=5,
                    help="Compute proper encoder MAP@10 on val set every N epochs.")
     return p.parse_args()
@@ -472,4 +478,5 @@ if __name__ == "__main__":
         split_train=args.split_train,
         split_val=args.split_val,
         val_every=args.val_every,
+        hard_negative_fraction=args.hard_negative_fraction,
     )
