@@ -669,39 +669,55 @@ Table~\ref{tab:ablation} presents MAP@10 across all five ablation factors.
 
 \begin{table}[t]
   \centering
-  \caption{Ablation Study (Macro-MAP@10, HiRISE v3 Test Split)}
+  \caption{Ablation Study (MAP@10, HiRISE v3)}
   \label{tab:ablation}
   \setlength{\tabcolsep}{4pt}
   \begin{tabular}{llc}
     \toprule
-    Ablation               & Configuration              & Macro-MAP@10   \\
+    Ablation               & Configuration              & MAP@10         \\
     \midrule
     \multirow{2}{*}{\textbf{A1}: Head type}
-                           & Classical MLP              & 0.528          \\
-                           & Quantum (ours)             & 0.533          \\
+                           & Classical MLP              & 0.528$^\dagger$\\
+                           & Quantum (ours)             & 0.533$^\dagger$\\
     \midrule
     \multirow{2}{*}{\textbf{A2}: Encoding \emph{(key)}}
-                           & Sequential (SLIQ-style)    & 0.472          \\
-                           & Interleaved (ours)         & 0.533          \\
+                           & Sequential (SLIQ-style)    & 0.472$^\dagger$\\
+                           & Interleaved (ours)         & 0.533$^\dagger$\\
     \midrule
     \multirow{3}{*}{\textbf{A3}: Circuit depth}
-                           & $L=1$                      & \res{X.XXX}    \\
-                           & $L=2$ (default)            & 0.533          \\
-                           & $L=3$                      & \res{X.XXX}    \\
+                           & $L=1$                      & 0.882$^*$      \\
+                           & $L=2$ (default)            & 0.879$^*$      \\
+                           & $L=3$                      & 0.883$^*$      \\
     \midrule
     \multirow{2}{*}{\textbf{A4}: Hard negatives}
                            & Random mining              & \res{X.XXX}    \\
-                           & Class-pair mining (ours)   & 0.533          \\
+                           & Class-pair mining (ours)   & 0.879$^*$      \\
     \midrule
     \multirow{3}{*}{\textbf{A5}: Qubit count}
-                           & $N=4$                      & \res{X.XXX}    \\
-                           & $N=8$ (default)            & 0.533          \\
+                           & $N=4$                      & 0.879$^*$      \\
+                           & $N=8$ (default)            & 0.879$^*$      \\
                            & $N=12$                     & \res{X.XXX}    \\
     \bottomrule
   \end{tabular}
   \vspace{2pt}
-  \\\footnotesize A1 and A2 results available; A3/A4/A5 ablation variants pending additional runs.
+  \\\footnotesize $^\dagger$Test-set macro-MAP@10 (equal class weighting; see Table~\ref{tab:main}).
+  $^*$Best-epoch validation micro-MAP@10 from training log; the same default configuration
+  scores 0.533 macro-MAP@10 on the test set (Table~\ref{tab:main}).
+  Test-set macro evaluation of A3/A4/A5 checkpoints pending.
+  A4 random-mining and A5 $N{=}12$ runs pending.
 \end{table}
+
+\textbf{Preliminary A3/A5 findings.}
+Based on best-epoch validation micro-MAP@10 (see Table~\ref{tab:ablation}
+footnote), circuit depth (A3) has negligible effect on retrieval performance:
+$L=1$ (0.882), $L=2$ (0.879), and $L=3$ (0.883) are within 0.4\% of each
+other, suggesting that a single entangling layer is sufficient at $N=8$
+qubits to capture the pairwise similarity structure learned from triplet loss.
+Qubit count (A5) shows similarly flat behavior between $N=4$ (0.879) and
+$N=8$ (0.879), implying that the embedding dimensionality bottleneck lies in
+the CNN projection head rather than the quantum Hilbert space size.
+Test-set macro-MAP@10 evaluation of A3/A5 checkpoints is pending; A4
+(hard vs.\ random negatives) and A5 $N{=}12$ runs are also pending.
 
 \subsection{Hard-Pair Confusion Reduction}
 
@@ -837,8 +853,8 @@ $256$-dimensional statevector.
 Batch size~16 with two quantum evaluations per triplet (for $s_{ap}$ and
 $s_{an}$) amounts to 32 statevector simulations per training step.
 This is substantially slower per epoch than the classical head on identical
-hardware; a precise speedup ratio will be reported alongside the classical
-baseline ablation run.
+hardware; a precise speedup ratio will be reported alongside the A4
+ablation run.
 On near-term quantum hardware, shot noise would further affect gradient
 estimates, though the local measurement strategy reduces required shots
 compared to global observables \cite{cerezo2021costbarren}.
@@ -846,12 +862,14 @@ We defer hardware-in-the-loop experiments to future work.
 
 \textbf{Qubit count (A5).}
 The hard cap of $N=12$ ($2^{12} = 4096$ statevector dimension) reflects
-simulation memory constraints.
-Scaling to $N>12$ would require a quantum hardware backend or
-matrix-product-state simulation.
-Ablation A5 investigates whether additional qubits (larger Hilbert space)
-consistently improve retrieval quality, which would provide justification
-for hardware-scale experiments.
+simulation memory constraints; scaling to $N>12$ would require a quantum
+hardware backend or matrix-product-state simulation.
+Preliminary results show that $N=4$ and $N=8$ achieve identical micro-MAP@10
+(0.879), suggesting that the retrieval bottleneck at this scale lies in the
+CNN projection dimensionality rather than the Hilbert space size.
+Whether larger qubit counts provide an advantage under macro-MAP@10—which
+penalizes minority-class errors more heavily—remains an open question pending
+test-set evaluation of the $N=4$ checkpoint and the $N=12$ run.
 
 % ── 8. Conclusion ─────────────────────────────────────────────────────────────
 \section{Conclusion}
@@ -877,8 +895,9 @@ outperforming both baselines on macro-MAP@10.
 learning and planetary science, achieving micro-MAP@10 = 0.879 and
 macro-MAP@10 = 0.533 on the HiRISE~v3 held-out test split.
 Immediate extensions include completing the five-factor ablation study
-(Classical head, SLIQ-style encoding, circuit depths $L\in\{1,3\}$,
-random-negative mining, and qubit counts $N\in\{4,12\}$),
+(random-negative mining A4, qubit count $N{=}12$ A5, and test-set macro
+evaluation of A3/A5 checkpoints already trained),
+incorporating the ResNet50 strong baseline,
 scaling to $N>12$ via hardware backends or tensor-network simulation,
 and extending the retrieval system to multi-temporal change detection
 across HiRISE revisit sequences.
