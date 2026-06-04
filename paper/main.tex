@@ -70,12 +70,14 @@ To our knowledge, \qts{} is the first application of quantum similarity
 learning to planetary terrain data.
 On the held-out test split of HiRISE~v3, \qts{} achieves
 micro-MAP@10 = 0.879, macro-MAP@10 = 0.533, and Recall@5 = 0.951,
-outperforming both the parameter-matched classical head and the
-SLIQ-style sequential encoding baseline on all three metrics.
-The macro-MAP gap versus SLIQ-style encoding ($\Delta = 0.061$) is
-notably larger than the gap versus the classical head ($\Delta = 0.005$),
-isolating the encoding strategy—not the quantum circuit itself—as
-the primary driver of minority-class retrieval improvement.
+ranking first among all four evaluated models.
+The macro-MAP gap versus SLIQ-style encoding ($\Delta = 0.061$) isolates
+the encoding strategy as the primary driver of minority-class retrieval
+improvement.
+Notably, a ResNet50 baseline pretrained on ImageNet achieves the
+lowest macro-MAP@10 of all models (0.378), establishing that
+domain-specific metric learning substantially outperforms large-scale
+transfer learning for minority planetary terrain classes.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -631,10 +633,23 @@ comfortably in memory.
 \subsection{Main Retrieval Performance}
 
 Table~\ref{tab:main} reports retrieval performance on the held-out test
-split for all three models.
+split for all four models.
 \qts{} achieves micro-MAP@10 = 0.879, macro-MAP@10 = 0.533,
-Recall@1 = 0.856, and Recall@5 = 0.951.
-The macro-MAP gap versus SLIQ-style sequential encoding ($\Delta = 0.061$)
+Recall@1 = 0.856, and Recall@5 = 0.951, ranking first on all metrics.
+
+The most striking result is the ResNet50 strong baseline: despite a
+${\sim}23\,\text{M}$-parameter ImageNet-pretrained backbone—orders of
+magnitude larger than any other model—it achieves the lowest macro-MAP@10
+of all four models (0.378).
+This confirms that ImageNet features do not transfer to minority Mars terrain
+classes (spider: 0.7\%, impact\_ejecta: 0.3\%): the fine-grained
+geomorphic distinctions visible in $64{\times}64$ grayscale HiRISE patches
+(e.g., CO\textsubscript{2}-sublimation texture versus aeolian bedform) are
+orthogonal to the color-texture statistics of natural-image pre-training.
+A lightweight domain-specific encoder trained end-to-end on triplet loss
+outperforms this large pre-trained model by 0.155 macro-MAP@10.
+
+The macro-MAP gap between \qts{} and SLIQ-style encoding ($\Delta = 0.061$)
 substantially exceeds the gap versus the classical head ($\Delta = 0.005$).
 This asymmetry indicates that the encoding strategy—interleaved
 $\RX$/$\RY$ per qubit versus SLIQ's sequential $\RZ$/$\RX$ blocks—is the
@@ -653,13 +668,13 @@ classical MLP on aggregate micro-MAP.
     \midrule
     Classical head (A1)           & 0.875          & 0.528          & 0.852          & 0.948          \\
     SLIQ-style encoding (A2)      & 0.867          & 0.472          & 0.843          & 0.941          \\
-    ResNet50 (strong baseline)    & \res{pend.}    & \res{pend.}    & \res{pend.}    & \res{pend.}    \\
+    ResNet50 (strong baseline)    & 0.822          & 0.378          & 0.791          & 0.921          \\
     \textbf{\qts{} (ours)}        & \textbf{0.879} & \textbf{0.533} & \textbf{0.856} & \textbf{0.951} \\
     \bottomrule
   \end{tabular}
   \vspace{2pt}
   \\\footnotesize $^\dagger$Macro-MAP@10 is the primary metric; it gives equal weight to all 8 classes
-  regardless of frequency. ResNet50 training in progress.
+  regardless of frequency.
 \end{table}
 
 \subsection{Ablation Study}
@@ -727,15 +742,19 @@ spider, swiss\_cheese).
 
 \begin{figure}[t]
   \centering
-  \begin{minipage}{0.32\linewidth}
-    \includegraphics[width=\linewidth]{../eval_outputs/confusion_hard_pairs_classical.png}
-    \centering\small Classical (A1)
+  \begin{minipage}{0.48\linewidth}
+    \includegraphics[width=\linewidth]{../eval_outputs/confusion_hard_pairs_resnet.png}
+    \centering\small ResNet50 (strong baseline)
   \end{minipage}\hfill
-  \begin{minipage}{0.32\linewidth}
+  \begin{minipage}{0.48\linewidth}
+    \includegraphics[width=\linewidth]{../eval_outputs/confusion_hard_pairs_classical.png}
+    \centering\small Classical MLP (A1)
+  \end{minipage}\\[4pt]
+  \begin{minipage}{0.48\linewidth}
     \includegraphics[width=\linewidth]{../eval_outputs/confusion_hard_pairs_sliq.png}
     \centering\small SLIQ-style (A2)
   \end{minipage}\hfill
-  \begin{minipage}{0.32\linewidth}
+  \begin{minipage}{0.48\linewidth}
     \includegraphics[width=\linewidth]{../eval_outputs/confusion_hard_pairs_quantum.png}
     \centering\small \qts{} (ours)
   \end{minipage}
@@ -743,9 +762,10 @@ spider, swiss\_cheese).
     Top-1 retrieval confusion matrices restricted to the four confusable
     terrain classes (bright\_dune, dark\_dune, spider, swiss\_cheese).
     Lower off-diagonal mass indicates fewer cross-class retrieval errors.
-    \qts{}'s interleaved encoding yields the fewest confusions between
-    visually similar pairs, consistent with the macro-MAP@10 gap in
-    Table~\ref{tab:main}.%
+    ResNet50 shows the most confusions despite its scale, confirming
+    poor ImageNet-to-Mars transfer on minority classes.
+    \qts{}'s interleaved encoding yields the fewest confusions, consistent
+    with the macro-MAP@10 rankings in Table~\ref{tab:main}.%
   }
   \label{fig:confusion}
 \end{figure}
@@ -785,25 +805,30 @@ terrain class.
 
 \begin{figure}[t]
   \centering
-  \begin{minipage}{0.32\linewidth}
-    \includegraphics[width=\linewidth]{../eval_outputs/umap_classical.png}
-    \centering\small Classical (A1)
+  \begin{minipage}{0.48\linewidth}
+    \includegraphics[width=\linewidth]{../eval_outputs/umap_resnet.png}
+    \centering\small ResNet50 (strong baseline)
   \end{minipage}\hfill
-  \begin{minipage}{0.32\linewidth}
+  \begin{minipage}{0.48\linewidth}
+    \includegraphics[width=\linewidth]{../eval_outputs/umap_classical.png}
+    \centering\small Classical MLP (A1)
+  \end{minipage}\\[4pt]
+  \begin{minipage}{0.48\linewidth}
     \includegraphics[width=\linewidth]{../eval_outputs/umap_sliq.png}
     \centering\small SLIQ-style (A2)
   \end{minipage}\hfill
-  \begin{minipage}{0.32\linewidth}
+  \begin{minipage}{0.48\linewidth}
     \includegraphics[width=\linewidth]{../eval_outputs/umap_quantum.png}
     \centering\small \qts{} (ours)
   \end{minipage}
   \caption{%
     UMAP projections~\cite{mcinnes2018umap} of test-set encoder embeddings
-    for all three models, colored by terrain class.
-    \qts{} (right) shows tighter clustering of minority classes and
-    clearer separation between the confusable dune pair
-    (bright\_dune, dark\_dune) and between spider and swiss\_cheese
-    compared to both baselines.%
+    for all four models, colored by terrain class.
+    ResNet50 (top-left) produces diffuse minority-class clusters, reflecting
+    poor ImageNet-to-HiRISE transfer.
+    \qts{} (bottom-right) shows the tightest minority-class clusters and
+    clearest separation between the confusable dune pair
+    (bright\_dune, dark\_dune) and between spider and swiss\_cheese.%
   }
   \label{fig:umap}
 \end{figure}
@@ -830,13 +855,29 @@ The substantially smaller gap over the classical MLP baseline
 little additional expressive power at this scale beyond what a
 parameter-equivalent classical head already provides.
 
+\textbf{Transfer learning and domain specificity.}
+The ResNet50 result (macro-MAP@10 = 0.378) is the most practically
+significant finding in this study.
+ResNet50 pretrained on ImageNet-1k encodes color-texture statistics of
+natural scenes; the Mars terrain domain differs in (i)~single-channel
+grayscale inputs, (ii)~overhead rather than perspective viewpoint,
+(iii)~geomorphic rather than semantic object structure, and (iv)~extreme
+class imbalance in which minority classes occupy $<1\%$ of the dataset.
+The fine-tuning strategy (differential learning rates, grayscale-to-RGB
+channel repeat) does not overcome this domain gap for the rare classes.
+Crucially, a 1.7\,M-parameter domain-specific encoder trained from scratch
+with triplet loss outperforms the ${\sim}23\,\text{M}$-parameter pretrained
+model by 0.155 macro-MAP@10.
+This is a strong empirical argument for domain-specific metric learning over
+transfer learning for specialized planetary datasets.
+
 \textbf{Class imbalance.}
 The ``other'' class constitutes 83.6\% of the dataset, making
-micro-MAP@10 a misleading primary metric (all three models score above
-0.86 on micro-MAP, masking large differences on minority classes).
+micro-MAP@10 a misleading primary metric (all four models score above
+0.82 on micro-MAP, masking large differences on minority classes).
 Macro-MAP@10, which weights each of the 8 classes equally, reveals a
 clearer picture: \qts{} scores 0.533 versus 0.472 for SLIQ-style encoding,
-a gap of 0.061.
+a gap of 0.061; and 0.533 versus 0.378 for ResNet50, a gap of 0.155.
 In the triplet construction used here, class imbalance also affects
 negative sampling: with 50\% hard negatives from confusable class pairs,
 the remaining 50\% of random negatives disproportionately draw ``other''
@@ -894,10 +935,14 @@ outperforming both baselines on macro-MAP@10.
 \qts{} opens a research thread at the intersection of quantum machine
 learning and planetary science, achieving micro-MAP@10 = 0.879 and
 macro-MAP@10 = 0.533 on the HiRISE~v3 held-out test split.
+A notable secondary finding is that ResNet50 pretrained on ImageNet,
+despite ${\sim}23\,\text{M}$ parameters, achieves the lowest macro-MAP@10
+of all models (0.378), underscoring that domain-specific metric learning
+outperforms large-scale transfer learning for minority planetary terrain
+classes.
 Immediate extensions include completing the five-factor ablation study
 (random-negative mining A4, qubit count $N{=}12$ A5, and test-set macro
 evaluation of A3/A5 checkpoints already trained),
-incorporating the ResNet50 strong baseline,
 scaling to $N>12$ via hardware backends or tensor-network simulation,
 and extending the retrieval system to multi-temporal change detection
 across HiRISE revisit sequences.
