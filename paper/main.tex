@@ -705,34 +705,39 @@ Table~\ref{tab:ablation} presents MAP@10 across all five ablation factors.
                            & $L=3$                      & 0.883$^*$      \\
     \midrule
     \multirow{2}{*}{\textbf{A4}: Hard negatives}
-                           & Random mining              & \res{X.XXX}    \\
+                           & Random mining              & 0.882$^*$      \\
                            & Class-pair mining (ours)   & 0.879$^*$      \\
     \midrule
     \multirow{3}{*}{\textbf{A5}: Qubit count}
                            & $N=4$                      & 0.879$^*$      \\
                            & $N=8$ (default)            & 0.879$^*$      \\
-                           & $N=12$                     & \res{X.XXX}    \\
+                           & $N=12$                     & 0.882$^*$      \\
     \bottomrule
   \end{tabular}
   \vspace{2pt}
   \\\footnotesize $^\dagger$Test-set macro-MAP@10 (equal class weighting; see Table~\ref{tab:main}).
   $^*$Best-epoch validation micro-MAP@10 from training log; the same default configuration
   scores 0.533 macro-MAP@10 on the test set (Table~\ref{tab:main}).
-  Test-set macro evaluation of A3/A4/A5 checkpoints pending.
-  A4 random-mining and A5 $N{=}12$ runs pending.
+  Test-set macro-MAP@10 evaluation of A3--A5 checkpoints pending.
 \end{table}
 
-\textbf{Preliminary A3/A5 findings.}
+\textbf{Preliminary A3--A5 findings.}
 Based on best-epoch validation micro-MAP@10 (see Table~\ref{tab:ablation}
-footnote), circuit depth (A3) has negligible effect on retrieval performance:
-$L=1$ (0.882), $L=2$ (0.879), and $L=3$ (0.883) are within 0.4\% of each
-other, suggesting that a single entangling layer is sufficient at $N=8$
-qubits to capture the pairwise similarity structure learned from triplet loss.
-Qubit count (A5) shows similarly flat behavior between $N=4$ (0.879) and
-$N=8$ (0.879), implying that the embedding dimensionality bottleneck lies in
-the CNN projection head rather than the quantum Hilbert space size.
-Test-set macro-MAP@10 evaluation of A3/A5 checkpoints is pending; A4
-(hard vs.\ random negatives) and A5 $N{=}12$ runs are also pending.
+footnote), all three remaining ablation dimensions show modest variation.
+Circuit depth (A3) has negligible effect: $L=1$ (0.882), $L=2$ (0.879),
+and $L=3$ (0.883) are within 0.4\% of each other, suggesting a single
+entangling layer suffices to capture pairwise similarity structure at $N=8$.
+Negative mining strategy (A4) is similarly insensitive on micro-MAP@10:
+random (0.882) and class-pair mining (0.879) are statistically
+indistinguishable at this metric, because the ``other'' class majority
+dominates micro-MAP@10 regardless of negative selection.
+Test-set macro-MAP@10 evaluation—which weights minority classes equally—is
+needed to determine whether hard negatives provide a meaningful benefit for
+the confusable class pairs; this evaluation is pending.
+Qubit count (A5) shows a slight upward trend: $N=4$ (0.879), $N=8$ (0.879),
+$N=12$ (0.882), consistent with a small Hilbert-space benefit at larger qubit
+counts, though the differences remain within noise on micro-MAP@10.
+Full test-set macro evaluation of all A3--A5 checkpoints is pending.
 
 \subsection{Hard-Pair Confusion Reduction}
 
@@ -894,23 +899,32 @@ $256$-dimensional statevector.
 Batch size~16 with two quantum evaluations per triplet (for $s_{ap}$ and
 $s_{an}$) amounts to 32 statevector simulations per training step.
 This is substantially slower per epoch than the classical head on identical
-hardware; a precise speedup ratio will be reported alongside the A4
-ablation run.
+hardware; wall-clock comparison is deferred to future work.
 On near-term quantum hardware, shot noise would further affect gradient
 estimates, though the local measurement strategy reduces required shots
 compared to global observables \cite{cerezo2021costbarren}.
 We defer hardware-in-the-loop experiments to future work.
 
+\textbf{Hard negative mining (A4).}
+Validation micro-MAP@10 shows random mining (0.882) and domain-specific
+class-pair mining (0.879) to be effectively indistinguishable, because
+83.6\% ``other'' class queries dominate micro-MAP@10 regardless of negative
+selection strategy.
+The mining benefit is expected to appear under macro-MAP@10, where minority
+class queries—for which hard negatives from the confusable partner class
+provide stronger gradient signal—are weighted equally to the majority.
+Test-set macro evaluation of the random-mining checkpoint is pending.
+
 \textbf{Qubit count (A5).}
 The hard cap of $N=12$ ($2^{12} = 4096$ statevector dimension) reflects
 simulation memory constraints; scaling to $N>12$ would require a quantum
 hardware backend or matrix-product-state simulation.
-Preliminary results show that $N=4$ and $N=8$ achieve identical micro-MAP@10
-(0.879), suggesting that the retrieval bottleneck at this scale lies in the
-CNN projection dimensionality rather than the Hilbert space size.
-Whether larger qubit counts provide an advantage under macro-MAP@10—which
-penalizes minority-class errors more heavily—remains an open question pending
-test-set evaluation of the $N=4$ checkpoint and the $N=12$ run.
+Validation micro-MAP@10 shows a slight upward trend across qubit counts
+($N{=}4$: 0.879, $N{=}8$: 0.879, $N{=}12$: 0.882), consistent with a
+marginal Hilbert-space benefit at $N{=}12$, though all values are within
+noise.
+Whether this trend extends to macro-MAP@10 remains an open question pending
+test-set evaluation of the A5 checkpoints.
 
 % ── 8. Conclusion ─────────────────────────────────────────────────────────────
 \section{Conclusion}
@@ -940,9 +954,8 @@ despite ${\sim}23\,\text{M}$ parameters, achieves the lowest macro-MAP@10
 of all models (0.378), underscoring that domain-specific metric learning
 outperforms large-scale transfer learning for minority planetary terrain
 classes.
-Immediate extensions include completing the five-factor ablation study
-(random-negative mining A4, qubit count $N{=}12$ A5, and test-set macro
-evaluation of A3/A5 checkpoints already trained),
+Immediate extensions include test-set macro-MAP@10 evaluation of all
+A3--A5 ablation checkpoints (training complete; macro evaluation pending),
 scaling to $N>12$ via hardware backends or tensor-network simulation,
 and extending the retrieval system to multi-temporal change detection
 across HiRISE revisit sequences.
