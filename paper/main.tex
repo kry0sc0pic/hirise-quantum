@@ -14,6 +14,8 @@
 \usepackage{multirow}
 \usepackage{makecell}
 \usepackage{bm}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 
 % Convenience macros
@@ -328,19 +330,75 @@ Figure~\ref{fig:architecture} illustrates the full pipeline.
 
 \begin{figure}[t]
   \centering
-  % Replace with actual architecture diagram
-  \fbox{\rule{0pt}{3.5cm}\rule{\linewidth}{0pt}}
+  \begin{tikzpicture}[
+    >=Stealth, semithick,
+    every node/.style={align=center},
+    blk/.style={draw, rounded corners=3pt, font=\small,
+                text width=5.0cm, minimum height=0.6cm, inner sep=4pt},
+    qblk/.style={draw, rounded corners=3pt, font=\scriptsize,
+                 text width=5.4cm, minimum height=0.5cm, inner sep=3pt},
+  ]
+  %-- Input patches
+  \node[blk, fill=gray!15] (inp) at (0,0)
+      {Input patches $\mathbf{x}_a,\,\mathbf{x}_b\;\in\mathbb{R}^{64\times64}$};
+
+  %-- Shared CNN encoder
+  \node[blk, fill=orange!20, below=0.35cm of inp] (cnn)
+      {Shared CNN encoder $\phi$\\\scriptsize Conv$\!\to\!$Pool$\!\to\!$Conv$\!\to\!$Pool$\!\to\!$Linear (tied weights)};
+
+  %-- L2-normalised embeddings
+  \node[blk, fill=orange!10, below=0.35cm of cnn] (emb)
+      {$\mathbf{e}_a,\,\mathbf{e}_b\;\in\;\mathbb{S}^{N-1}$\\\scriptsize $\ell_2$-normalised $N$-dim unit-sphere embeddings};
+
+  %-- Interleaved encoding
+  \node[qblk, fill=blue!8, below=0.55cm of emb] (enc)
+      {$R_X\!\bigl(\pi e_a^{(i)}\bigr)\;R_Y\!\bigl(\pi e_b^{(i)}\bigr)$,\;$i=1\ldots N$\\[1pt]
+       \tiny interleaved encoding --- nonlinear joint state per qubit};
+
+  %-- Variational ansatz
+  \node[qblk, fill=violet!8, below=0.2cm of enc] (sel)
+      {StronglyEntanglingLayers, depth $L$\\[1pt]
+       \tiny $3NL$ variational parameters ($=48$ for $N{=}8,L{=}2$)};
+
+  %-- Local measurements
+  \node[qblk, fill=teal!8, below=0.2cm of sel] (meas)
+      {$\langle Z_i\rangle,\;i=1\ldots N$\quad (local Pauli-$Z$)\\[1pt]
+       \tiny at-most polynomial gradient decay (Cerezo et al.\ 2021)};
+
+  %-- Output layer
+  \node[qblk, fill=yellow!15, below=0.2cm of meas] (linout)
+      {Linear $(N\!\to\!1)$ $+$ Sigmoid $\;\Rightarrow\; s\!\in\!(0,1)$};
+
+  %-- Background frame around quantum head
+  \begin{scope}[on background layer]
+    \node[draw=blue!50, very thick, rounded corners=6pt, fill=blue!3,
+          fit=(enc)(sel)(meas)(linout), inner sep=5pt] (qhead) {};
+  \end{scope}
+  \node[font=\scriptsize\bfseries, blue!55, above=3pt of qhead.north]
+      {Quantum Similarity Head $\psi$};
+
+  %-- Triplet loss
+  \node[blk, fill=green!20, below=0.55cm of qhead] (loss)
+      {Triplet Loss $\mathcal{L}$\; (Section~\ref{sec:training})};
+
+  %-- Arrows
+  \draw[->] (inp)          -- (cnn);
+  \draw[->] (cnn)          -- (emb);
+  \draw[->] (emb)          -- (enc);
+  \draw[->] (enc)          -- (sel);
+  \draw[->] (sel)          -- (meas);
+  \draw[->] (meas)         -- (linout);
+  \draw[->] (qhead.south)  -- (loss);
+  \end{tikzpicture}
   \caption{%
     \qts{} architecture.
     A shared CNN encoder maps $64{\times}64$ grayscale terrain patches to
-    $N$-dimensional unit-sphere embeddings.
-    The quantum similarity head applies interleaved angle encoding
-    (Contribution~2) followed by a strongly entangling variational ansatz
+    $N$-dimensional unit-sphere embeddings (both branches share weights).
+    The quantum similarity head applies interleaved $\RX$/$\RY$ angle
+    encoding (Contribution~2), a strongly entangling variational ansatz,
     and local Pauli-$\PauliZ$ measurements (Contribution~3),
-    returning a scalar similarity score.
-    The full pipeline is trained end-to-end with triplet loss
-    (Section~\ref{sec:training}).
-    \textbf{[Replace with vector diagram before submission.]}%
+    returning a scalar similarity score $s\in(0,1)$.
+    The full pipeline is trained end-to-end with triplet loss.
   }
   \label{fig:architecture}
 \end{figure}
@@ -705,39 +763,35 @@ Table~\ref{tab:ablation} presents MAP@10 across all five ablation factors.
                            & $L=3$                      & 0.883$^*$      \\
     \midrule
     \multirow{2}{*}{\textbf{A4}: Hard negatives}
-                           & Random mining              & 0.882$^*$      \\
-                           & Class-pair mining (ours)   & 0.879$^*$      \\
+                           & Random mining              & 0.538$^\dagger$\\
+                           & Class-pair mining (ours)   & 0.533$^\dagger$\\
     \midrule
     \multirow{3}{*}{\textbf{A5}: Qubit count}
-                           & $N=4$                      & 0.879$^*$      \\
-                           & $N=8$ (default)            & 0.879$^*$      \\
-                           & $N=12$                     & 0.882$^*$      \\
+                           & $N=4$                      & 0.540$^\dagger$\\
+                           & $N=8$ (default)            & 0.533$^\dagger$\\
+                           & $N=12$                     & 0.515$^\dagger$\\
     \bottomrule
   \end{tabular}
   \vspace{2pt}
   \\\footnotesize $^\dagger$Test-set macro-MAP@10 (equal class weighting; see Table~\ref{tab:main}).
   $^*$Best-epoch validation micro-MAP@10 from training log; the same default configuration
   scores 0.533 macro-MAP@10 on the test set (Table~\ref{tab:main}).
-  Test-set macro-MAP@10 evaluation of A3--A5 checkpoints pending.
+  A4 and A5 checkpoints have been evaluated on the held-out test set.
+  Test-set macro-MAP@10 evaluation of A3 checkpoints pending.
 \end{table}
 
-\textbf{Preliminary A3--A5 findings.}
-Based on best-epoch validation micro-MAP@10 (see Table~\ref{tab:ablation}
-footnote), all three remaining ablation dimensions show modest variation.
-Circuit depth (A3) has negligible effect: $L=1$ (0.882), $L=2$ (0.879),
-and $L=3$ (0.883) are within 0.4\% of each other, suggesting a single
-entangling layer suffices to capture pairwise similarity structure at $N=8$.
-Negative mining strategy (A4) is similarly insensitive on micro-MAP@10:
-random (0.882) and class-pair mining (0.879) are statistically
-indistinguishable at this metric, because the ``other'' class majority
-dominates micro-MAP@10 regardless of negative selection.
-Test-set macro-MAP@10 evaluation—which weights minority classes equally—is
-needed to determine whether hard negatives provide a meaningful benefit for
-the confusable class pairs; this evaluation is pending.
-Qubit count (A5) shows a slight upward trend: $N=4$ (0.879), $N=8$ (0.879),
-$N=12$ (0.882), consistent with a small Hilbert-space benefit at larger qubit
-counts, though the differences remain within noise on micro-MAP@10.
-Full test-set macro evaluation of all A3--A5 checkpoints is pending.
+\textbf{A3--A5 findings.}
+Circuit depth (A3): validation micro-MAP@10 shows negligible variation across
+$L=1$ (0.882), $L=2$ (0.879), and $L=3$ (0.883), suggesting a single
+entangling layer suffices at $N=8$; test-set macro evaluation of A3
+checkpoints is pending.
+Negative mining strategy (A4): test-set macro-MAP@10 shows random mining
+(0.538) marginally outperforms class-pair mining (0.533), confirming no
+clear benefit from domain-specific hard negatives at the macro level.
+Qubit count (A5): test-set macro-MAP@10 \emph{decreases} monotonically with
+qubit count---$N=4$ (0.540), $N=8$ (0.533), $N=12$ (0.515)---reversing the
+micro-MAP@10 trend and indicating that larger Hilbert spaces do not improve
+minority-class retrieval at this scale.
 
 \subsection{Hard-Pair Confusion Reduction}
 
@@ -906,25 +960,35 @@ compared to global observables \cite{cerezo2021costbarren}.
 We defer hardware-in-the-loop experiments to future work.
 
 \textbf{Hard negative mining (A4).}
-Validation micro-MAP@10 shows random mining (0.882) and domain-specific
-class-pair mining (0.879) to be effectively indistinguishable, because
-83.6\% ``other'' class queries dominate micro-MAP@10 regardless of negative
-selection strategy.
-The mining benefit is expected to appear under macro-MAP@10, where minority
-class queries—for which hard negatives from the confusable partner class
-provide stronger gradient signal—are weighted equally to the majority.
-Test-set macro evaluation of the random-mining checkpoint is pending.
+Test-set macro-MAP@10 shows random mining (0.538) marginally outperforms
+class-pair mining (0.533), with $\Delta = 0.005$ in the direction opposite
+to the expected benefit.
+This indicates that domain-specific hard negative mining of confusable class
+pairs does not provide a measurable advantage for minority-class retrieval
+at this embedding dimensionality and training scale.
+A possible explanation is that the confusable pairs (bright\_dune/dark\_dune,
+spider/swiss\_cheese) are already difficult regardless of mining strategy,
+and the additional gradient pressure from forcing 50\% of negatives to come
+from the confusable partner class does not further differentiate the learned
+embedding space at $N=8$.
 
 \textbf{Qubit count (A5).}
 The hard cap of $N=12$ ($2^{12} = 4096$ statevector dimension) reflects
 simulation memory constraints; scaling to $N>12$ would require a quantum
 hardware backend or matrix-product-state simulation.
-Validation micro-MAP@10 shows a slight upward trend across qubit counts
-($N{=}4$: 0.879, $N{=}8$: 0.879, $N{=}12$: 0.882), consistent with a
-marginal Hilbert-space benefit at $N{=}12$, though all values are within
-noise.
-Whether this trend extends to macro-MAP@10 remains an open question pending
-test-set evaluation of the A5 checkpoints.
+Test-set macro-MAP@10 decreases monotonically with qubit count:
+$N=4$ (0.540), $N=8$ (0.533), $N=12$ (0.515).
+This reverses the micro-MAP@10 trend, where all three configurations scored
+approximately 0.879.
+A likely cause is that increasing $N$ simultaneously increases (i)~the
+encoder output dimension (the CNN must embed discriminative terrain structure
+into a higher-dimensional space from the same $64\!\times\!64$ inputs) and
+(ii)~the number of variational parameters ($3NL$ grows linearly), making the
+optimization landscape harder to traverse within 50 epochs.
+The $N=4$ result—four qubits, four-dimensional embeddings—achieves the
+highest macro-MAP@10 of any A5 variant, suggesting that compact embeddings
+better capture the coarse class structure relevant to minority-class
+retrieval at this dataset scale.
 
 % ── 8. Conclusion ─────────────────────────────────────────────────────────────
 \section{Conclusion}
@@ -954,8 +1018,8 @@ despite ${\sim}23\,\text{M}$ parameters, achieves the lowest macro-MAP@10
 of all models (0.378), underscoring that domain-specific metric learning
 outperforms large-scale transfer learning for minority planetary terrain
 classes.
-Immediate extensions include test-set macro-MAP@10 evaluation of all
-A3--A5 ablation checkpoints (training complete; macro evaluation pending),
+Immediate extensions include test-set macro-MAP@10 evaluation of A3
+ablation checkpoints (training complete; macro evaluation pending),
 scaling to $N>12$ via hardware backends or tensor-network simulation,
 and extending the retrieval system to multi-temporal change detection
 across HiRISE revisit sequences.
