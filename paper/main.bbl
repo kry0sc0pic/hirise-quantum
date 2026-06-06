@@ -26,6 +26,12 @@ M.~Cerezo, A.~Sone, T.~Volkoff, L.~Cincio, and P.~J. Coles, ``Cost function
   dependent barren plateaus in shallow parametrized quantum circuits,''
   \emph{Nature Communications}, vol.~12, p. 1791, 2021.
 
+\bibitem{silver2023sliq}
+D.~Silver, T.~Patel, A.~Ranjan, H.~Gandhi, W.~Cutler, and D.~Tiwari, ``{SLIQ}:
+  Quantum image similarity networks on noisy quantum computers,'' in
+  \emph{Proceedings of the AAAI Conference on Artificial Intelligence},
+  vol.~37, no.~8, 2023, pp. 9846--9854.
+
 \bibitem{wagstaff2018deepmars}
 K.~L. Wagstaff, Y.~Lu, A.~Stanboli, K.~Grimes, T.~Gowda, and J.~Padams, ``{Deep
   Mars}: {CNN} classification of mars imagery for the {PDS} imaging atlas,'' in
@@ -41,12 +47,6 @@ K.~Wagstaff, S.~Lu, E.~Dunkel, K.~Grimes, B.~Zhao, J.~Cai, S.~B. Cole,
   vol.~35, no.~17.\hskip 1em plus 0.5em minus 0.4em\relax AAAI Press, 2021, pp.
   15\,204--15\,213.
 
-\bibitem{rothrock2016spoc}
-B.~Rothrock, R.~Kennedy, C.~Cunningham, J.~Papon, M.~Heverly, and M.~Ono,
-  ``{SPOC}: Deep learning-based terrain classification for mars rover
-  missions,'' in \emph{AIAA SPACE 2016 Forum}.\hskip 1em plus 0.5em minus
-  0.4em\relax American Institute of Aeronautics and Astronautics, 2016.
-
 \bibitem{lloyd2020embeddings}
 S.~Lloyd, M.~Schuld, A.~Ijaz, J.~Izaac, and N.~Killoran, ``Quantum embeddings
   for machine learning,'' 2020.
@@ -60,11 +60,11 @@ A.~Mari, T.~R. Bromley, J.~Izaac, M.~Schuld, and N.~Killoran, ``Transfer
   learning in hybrid classical-quantum neural networks,'' \emph{Quantum},
   vol.~4, p. 340, 2020.
 
-\bibitem{silver2023sliq}
-D.~Silver, T.~Patel, A.~Ranjan, H.~Gandhi, W.~Cutler, and D.~Tiwari, ``{SLIQ}:
-  Quantum image similarity networks on noisy quantum computers,'' in
-  \emph{Proceedings of the AAAI Conference on Artificial Intelligence},
-  vol.~37, no.~8, 2023, pp. 9846--9854.
+\bibitem{rothrock2016spoc}
+B.~Rothrock, R.~Kennedy, C.~Cunningham, J.~Papon, M.~Heverly, and M.~Ono,
+  ``{SPOC}: Deep learning-based terrain classification for mars rover
+  missions,'' in \emph{AIAA SPACE 2016 Forum}.\hskip 1em plus 0.5em minus
+  0.4em\relax American Institute of Aeronautics and Astronautics, 2016.
 
 \bibitem{palafox2017automated}
 L.~F. Palafox, C.~W. Hamilton, S.~P. Scheidt, and A.~M. Alvarez, ``Automated
@@ -80,6 +80,11 @@ J.~Biamonte, P.~Wittek, N.~Pancotti, P.~Rebentrost, N.~Wiebe, and S.~Lloyd,
 V.~Havl\'{i}\v{c}ek, A.~D. C\'{o}rcoles, K.~Temme, A.~W. Harrow, A.~Kandala,
   J.~M. Chow, and J.~M. Gambetta, ``Supervised learning with quantum-enhanced
   feature spaces,'' \emph{Nature}, vol. 567, no. 7747, pp. 209--212, 2019.
+
+\bibitem{mcclean2018barren}
+J.~R. McClean, S.~Boixo, V.~N. Smelyanskiy, R.~Babbush, and H.~Neven, ``Barren
+  plateaus in quantum neural network training landscapes,'' \emph{Nature
+  Communications}, vol.~9, p. 4812, 2018.
 
 \bibitem{schroff2015facenet}
 F.~Schroff, D.~Kalenichenko, and J.~Philbin, ``{FaceNet}: A unified embedding
@@ -101,11 +106,6 @@ Y.~Suh, B.~Han, W.~Kim, and K.~M. Lee, ``Stochastic class-based hard example
   mining for deep metric learning,'' in \emph{Proceedings of the IEEE/CVF
   Conference on Computer Vision and Pattern Recognition (CVPR)}, 2019, pp.
   7251--7259.
-
-\bibitem{mcclean2018barren}
-J.~R. McClean, S.~Boixo, V.~N. Smelyanskiy, R.~Babbush, and H.~Neven, ``Barren
-  plateaus in quantum neural network training landscapes,'' \emph{Nature
-  Communications}, vol.~9, p. 4812, 2018.
 
 \bibitem{schuld2020circuitcentric}
 M.~Schuld, A.~Bocharov, K.~M. Svore, and N.~Wiebe, ``Circuit-centric quantum
@@ -130,9 +130,15 @@ M.~J.~D. Powell, ``A direct search optimization method that models the
   Hennart, Eds.\hskip 1em plus 0.5em minus 0.4em\relax Springer, 1994, pp.
   51--67.
 
-\bibitem{mcinnes2018umap}
-L.~McInnes, J.~Healy, and J.~Melville, ``{UMAP}: Uniform manifold approximation
-  and projection for dimension reduction,'' \emph{arXiv preprint
-  arXiv:1802.03426}, 2018.
+\bibitem{dincer2021hirise}
+\BIBentryALTinterwordspacing
+B.~Dincer, ``{HiRISE} map--{Mars} {NASA} image dataset,'' Kaggle, 2021.
+  [Online]. Available:
+  \url{https://www.kaggle.com/datasets/brsdincer/hirise-map-mars-nasa-image}
+\BIBentrySTDinterwordspacing
+
+\bibitem{anthropic2024claude}
+{Anthropic}, ``Claude: {AI} assistant,''
+  \url{https://www.anthropic.com/claude}, 2024.
 
 \end{thebibliography}
