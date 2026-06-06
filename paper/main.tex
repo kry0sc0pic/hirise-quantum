@@ -16,6 +16,7 @@
 \usepackage{bm}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit,backgrounds}
+\usepackage{quantikz}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 
 % Convenience macros
@@ -514,17 +515,48 @@ Figure~\ref{fig:circuit} illustrates the complete circuit structure.
 
 \begin{figure}[t]
   \centering
-  % Replace with actual PennyLane circuit diagram (qml.draw or Quantikz)
-  \fbox{\rule{0pt}{3.5cm}\rule{\linewidth}{0pt}}
+  \begin{quantikz}[row sep={0.72cm,between origins}, column sep=0.48cm]
+    \lstick{$q_0\;|0\rangle$}
+      & \gate[style={fill=blue!15}]{\scriptstyle R_X(\pi e_a^{(0)})}
+      & \gate[style={fill=orange!15}]{\scriptstyle R_Y(\pi e_b^{(0)})}
+      & \gate[4, style={fill=violet!8}]{%
+            \substack{\text{SEL}\\[2pt]\scriptstyle L~\text{layers}\\[1pt]
+                      \scriptstyle (3NL~\text{params})}}
+      & \meter{}
+      & \rstick{$\langle Z_0\rangle$} \\
+    \lstick{$q_1\;|0\rangle$}
+      & \gate[style={fill=blue!15}]{\scriptstyle R_X(\pi e_a^{(1)})}
+      & \gate[style={fill=orange!15}]{\scriptstyle R_Y(\pi e_b^{(1)})}
+      &
+      & \meter{}
+      & \rstick{$\langle Z_1\rangle$} \\
+    \lstick{$q_2\;|0\rangle$}
+      & \gate[style={fill=blue!15}]{\scriptstyle R_X(\pi e_a^{(2)})}
+      & \gate[style={fill=orange!15}]{\scriptstyle R_Y(\pi e_b^{(2)})}
+      &
+      & \meter{}
+      & \rstick{$\langle Z_2\rangle$} \\
+    \lstick{$q_3\;|0\rangle$}
+      & \gate[style={fill=blue!15}]{\scriptstyle R_X(\pi e_a^{(3)})}
+      & \gate[style={fill=orange!15}]{\scriptstyle R_Y(\pi e_b^{(3)})}
+      &
+      & \meter{}
+      & \rstick{$\langle Z_3\rangle$} \\
+  \end{quantikz}
   \caption{%
-    The entangled-pair quantum circuit (shown for $N=4$ for clarity).
-    Each wire~$i$ receives $\RX(\pi e_a^{(i)})$ (blue) encoding the
-    first embedding, then $\RY(\pi e_b^{(i)})$ (orange) encoding the
-    second via an orthogonal axis.
-    StronglyEntanglingLayers (depth $L=2$) creates inter-qubit
-    entanglement.
-    Local $\PauliZ_i$ measurements follow.
-    \textbf{[Replace with Quantikz vector diagram before submission.]}%
+    Entangled-pair quantum circuit (shown for $N=4$ for clarity).
+    Each wire~$i$ first receives $\RX(\pi e_a^{(i)})$ (blue), encoding
+    component~$i$ of the first embedding via rotation around the $X$-axis,
+    then $\RY(\pi e_b^{(i)})$ (orange), encoding component~$i$ of the second
+    embedding around the orthogonal $Y$-axis.
+    Because $[\RX,\RY]\neq 0$, the resulting per-qubit state is a nonlinear
+    joint function of both inputs.
+    \emph{SEL}: StronglyEntanglingLayers~\cite{bergholm2018pennylane}, depth
+    $L$, with $3NL$ variational parameters $\bm{\theta}$; at $N{=}8, L{=}2$
+    this is 48 parameters.
+    Each wire is measured locally with Pauli-$\PauliZ$, yielding
+    $\langle Z_i\rangle\in[-1,1]$, which is passed to a trainable linear
+    layer and sigmoid to produce the similarity score $s\in(0,1)$.
   }
   \label{fig:circuit}
 \end{figure}
