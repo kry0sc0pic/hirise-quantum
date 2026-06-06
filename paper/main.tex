@@ -758,9 +758,9 @@ Table~\ref{tab:ablation} presents MAP@10 across all five ablation factors.
                            & Interleaved (ours)         & 0.533$^\dagger$\\
     \midrule
     \multirow{3}{*}{\textbf{A3}: Circuit depth}
-                           & $L=1$                      & 0.882$^*$      \\
-                           & $L=2$ (default)            & 0.879$^*$      \\
-                           & $L=3$                      & 0.883$^*$      \\
+                           & $L=1$                      & 0.538$^\dagger$\\
+                           & $L=2$ (default)            & 0.533$^\dagger$\\
+                           & $L=3$                      & 0.556$^\dagger$\\
     \midrule
     \multirow{2}{*}{\textbf{A4}: Hard negatives}
                            & Random mining              & 0.538$^\dagger$\\
@@ -774,24 +774,24 @@ Table~\ref{tab:ablation} presents MAP@10 across all five ablation factors.
   \end{tabular}
   \vspace{2pt}
   \\\footnotesize $^\dagger$Test-set macro-MAP@10 (equal class weighting; see Table~\ref{tab:main}).
-  $^*$Best-epoch validation micro-MAP@10 from training log; the same default configuration
-  scores 0.533 macro-MAP@10 on the test set (Table~\ref{tab:main}).
-  A4 and A5 checkpoints have been evaluated on the held-out test set.
-  Test-set macro-MAP@10 evaluation of A3 checkpoints pending.
+  All ablation checkpoints evaluated on the held-out test split.
 \end{table}
 
 \textbf{A3--A5 findings.}
-Circuit depth (A3): validation micro-MAP@10 shows negligible variation across
-$L=1$ (0.882), $L=2$ (0.879), and $L=3$ (0.883), suggesting a single
-entangling layer suffices at $N=8$; test-set macro evaluation of A3
-checkpoints is pending.
-Negative mining strategy (A4): test-set macro-MAP@10 shows random mining
-(0.538) marginally outperforms class-pair mining (0.533), confirming no
-clear benefit from domain-specific hard negatives at the macro level.
-Qubit count (A5): test-set macro-MAP@10 \emph{decreases} monotonically with
-qubit count---$N=4$ (0.540), $N=8$ (0.533), $N=12$ (0.515)---reversing the
-micro-MAP@10 trend and indicating that larger Hilbert spaces do not improve
-minority-class retrieval at this scale.
+Circuit depth (A3): test-set macro-MAP@10 is non-monotone in depth---$L=1$
+(0.538), $L=2$ (0.533), $L=3$ (0.556)---with $L=3$ achieving the best
+macro-MAP@10 of any A3--A5 variant ($\Delta{=}+0.023$ over the $L=2$
+default).
+Unlike micro-MAP@10, which was insensitive to depth, macro-MAP@10 reveals
+that additional entangling layers benefit minority-class retrieval, likely by
+creating richer cross-qubit correlations that better separate the
+low-frequency terrain classes.
+Negative mining strategy (A4): random mining (0.538) marginally outperforms
+class-pair mining (0.533), confirming no clear benefit from domain-specific
+hard negatives at the macro level.
+Qubit count (A5): macro-MAP@10 \emph{decreases} with qubit count---$N=4$
+(0.540), $N=8$ (0.533), $N=12$ (0.515)---indicating that larger Hilbert
+spaces do not improve minority-class retrieval at this training scale.
 
 \subsection{Hard-Pair Confusion Reduction}
 
@@ -959,6 +959,21 @@ estimates, though the local measurement strategy reduces required shots
 compared to global observables \cite{cerezo2021costbarren}.
 We defer hardware-in-the-loop experiments to future work.
 
+\textbf{Circuit depth (A3).}
+The test-set macro-MAP@10 results for circuit depth are non-monotone and
+practically significant: $L=3$ (0.556) outperforms both $L=1$ (0.538) and
+the default $L=2$ (0.533) by a margin of $\Delta = 0.023$ and $0.023$
+respectively.
+This diverges from the micro-MAP@10 picture (where all three depths scored
+within 0.4\% of each other), suggesting that deeper circuits improve
+minority-class discriminability without affecting aggregate retrieval.
+Mechanistically, each StronglyEntanglingLayer adds a full round of CZ
+entangling gates across all qubit pairs; at $L=3$, the circuit has sufficient
+depth to create multi-hop cross-qubit correlations that encode finer-grained
+embedding-pair relationships relevant to the rare terrain classes.
+This finding suggests that the default $L=2$ is a suboptimal choice: a
+practitioner deploying \qts{} on hardware or simulator should prefer $L=3$.
+
 \textbf{Hard negative mining (A4).}
 Test-set macro-MAP@10 shows random mining (0.538) marginally outperforms
 class-pair mining (0.533), with $\Delta = 0.005$ in the direction opposite
@@ -1018,9 +1033,8 @@ despite ${\sim}23\,\text{M}$ parameters, achieves the lowest macro-MAP@10
 of all models (0.378), underscoring that domain-specific metric learning
 outperforms large-scale transfer learning for minority planetary terrain
 classes.
-Immediate extensions include test-set macro-MAP@10 evaluation of A3
-ablation checkpoints (training complete; macro evaluation pending),
-scaling to $N>12$ via hardware backends or tensor-network simulation,
+Immediate extensions include scaling to $N>12$ via hardware backends or
+tensor-network simulation,
 and extending the retrieval system to multi-temporal change detection
 across HiRISE revisit sequences.
 A longer-range direction is cross-instrument terrain matching: applying the
