@@ -448,18 +448,13 @@ the composition in~\eqref{eq:encoding} is a rotation on the Bloch sphere
 that is a \emph{nonlinear joint function} of both $e_a^{(i)}$ and
 $e_b^{(i)}$—it cannot be written as a sum of independent contributions
 from each embedding.
-Concretely, expanding the product of $SU(2)$ matrices,
+Concretely, letting $c_x\!\equiv\!\cos\tfrac{x}{2}$ and
+$s_x\!\equiv\!\sin\tfrac{x}{2}$, expanding the $SU(2)$ product gives
 \begin{equation}
 \RY(\beta)\RX(\alpha) =
 \begin{pmatrix}
-\cos\!\tfrac{\beta}{2}\cos\!\tfrac{\alpha}{2}
-  - i\sin\!\tfrac{\beta}{2}\sin\!\tfrac{\alpha}{2} &
--\sin\!\tfrac{\beta}{2}\cos\!\tfrac{\alpha}{2}
-  - i\cos\!\tfrac{\beta}{2}\sin\!\tfrac{\alpha}{2} \\
-\sin\!\tfrac{\beta}{2}\cos\!\tfrac{\alpha}{2}
-  + i\cos\!\tfrac{\beta}{2}\sin\!\tfrac{\alpha}{2} &
-\cos\!\tfrac{\beta}{2}\cos\!\tfrac{\alpha}{2}
-  + i\sin\!\tfrac{\beta}{2}\sin\!\tfrac{\alpha}{2}
+c_\beta c_\alpha - i s_\beta s_\alpha & -s_\beta c_\alpha - i c_\beta s_\alpha \\
+s_\beta c_\alpha + i c_\beta s_\alpha &  c_\beta c_\alpha + i s_\beta s_\alpha
 \end{pmatrix},
 \end{equation}
 where both real and imaginary parts mix $\alpha$ and $\beta$
