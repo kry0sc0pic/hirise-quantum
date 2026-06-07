@@ -44,25 +44,24 @@ Orbiter archive is fundamental to scientific query answering and mission
 planning, yet existing deep learning approaches frame terrain similarity as
 classification rather than ranked retrieval.
 We present \qts{} (Quantum Terrain Similarity), a quantum metric
-learning architecture applied to planetary terrain data.
+learning architecture for planetary terrain image retrieval.
 The core contribution is an \emph{entangled-pair} Parametric Quantum Circuit
 (PQC) used as a Siamese similarity head: given two CNN embeddings
 $\mathbf{e}_a, \mathbf{e}_b \in \mathbb{S}^{N-1}$, the circuit applies
 interleaved $\RX(\pi e_a^{(i)})$/$\RY(\pi e_b^{(i)})$ rotations on each
 wire~$i$, jointly encoding both embeddings before any entangling gate is
 applied.
-Local Pauli-$\PauliZ$ measurements suppress barren plateaus following
-Cerezo~et~al.~\cite{cerezo2021costbarren}.
+Local Pauli-$\PauliZ$ measurements follow cost-function-dependent barren
+plateau mitigation, keeping gradients informative throughout training.
 The pipeline is trained end-to-end with triplet loss and domain-specific
 hard negative mining targeting the geologically confusable class pairs in
 HiRISE~v3.
 A five-factor ablation (head type, encoding strategy, circuit depth, hard
 negative mining, qubit count) on HiRISE~v3 (73,031 patches, 8 terrain
-classes) shows that the default configuration ($N{=}8$, $L{=}2$) achieves
-macro-MAP@10 = 0.533 on the held-out test split, with $L{=}3$ reaching
-0.556.
+classes) yields macro-MAP@10 = 0.533 for the default configuration
+($N{=}8$, $L{=}2$), with $L{=}3$ reaching 0.556---the best single-factor result.
 The encoding strategy accounts for the largest performance gap
-($\Delta{=}0.061$ over SLIQ-style sequential encoding~\cite{silver2023sliq}).
+($\Delta{=}0.061$ over SLIQ-style sequential encoding).
 A ResNet50 ImageNet-pretrained strong baseline achieves macro-MAP@10 of
 only 0.378, underscoring the value of domain-specific metric learning for
 minority planetary terrain classes.

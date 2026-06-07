@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.10.14)  7 JUN 2026 10:26
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.10.14)  7 JUN 2026 10:45
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1012,22 +1012,22 @@ Package hyperref Info: Link coloring ON on input line 30.
 \openout4 = `main.out'.
 
 
-Underfull \hbox (badness 2221) in paragraph at lines 123--127
+Underfull \hbox (badness 2221) in paragraph at lines 122--126
 []\OT1/ptm/b/n/10 Quantum sim-i-lar-ity learn-ing ap-plied to plan-e-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 141--145
+Underfull \hbox (badness 10000) in paragraph at lines 140--144
 []\OT1/ptm/b/n/10 Domain-specific hard neg-a-tive min-ing.
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 141--145
+Underfull \hbox (badness 10000) in paragraph at lines 140--144
 \OT1/ptm/m/n/10 Neg-a-tives tar-get ge-o-log-i-cally con-fus-able pairs
  []
 
 
-Underfull \hbox (badness 3601) in paragraph at lines 141--145
+Underfull \hbox (badness 3601) in paragraph at lines 140--144
 \OT1/ptm/m/n/10 by pixel-space class-mean sim-i-lar-ity; ab-la-tion A4
  []
 
@@ -1036,12 +1036,12 @@ Underfull \hbox (badness 3601) in paragraph at lines 141--145
 
 
 ] [2]
-Overfull \hbox (37.51501pt too wide) in paragraph at lines 396--411
+Overfull \hbox (37.51501pt too wide) in paragraph at lines 395--410
  [][] 
  []
 
 
-Overfull \hbox (9.32895pt too wide) detected at line 502
+Overfull \hbox (9.32895pt too wide) detected at line 501
 [][][][]\OT1/cmr/m/n/10 @\OML/cmm/m/it/10 K\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 q\
 OT1/cmr/m/n/10 ) = [] [] \OML/cmm/m/it/10 P\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 k\
 OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 ^^A \OT1/cmr/bx/n/10 1\OT1/cmr/m/n/10 [[]\OML
@@ -1050,71 +1050,71 @@ OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 ^^A \OT1/cmr/bx/n/10 1\OT1/cmr/m/n/10 [[]\OML
 
 [3]
 LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 5
-44.
+43.
  (C:\Program Files\MiKTeX\tex/latex/psnfss\ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
-Underfull \hbox (badness 10000) in paragraph at lines 552--558
+Underfull \hbox (badness 10000) in paragraph at lines 551--557
 []\OT1/ptm/b/n/10 ResNet50 base-line. \OT1/ptm/m/n/10 ImageNet-pretrained back-
 bone;
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 552--558
+Underfull \hbox (badness 10000) in paragraph at lines 551--557
 \OT1/ptm/m/n/10 grayscale repli-cated to 3 chan-nels (no first-layer
  []
 
 
-Underfull \hbox (badness 5741) in paragraph at lines 552--558
+Underfull \hbox (badness 5741) in paragraph at lines 551--557
 \OT1/ptm/m/n/10 reini-tial-iza-tion); fine-tuned end-to-end with triplet loss
  []
 
 
-Overfull \hbox (5.71812pt too wide) in paragraph at lines 598--609
+Overfull \hbox (5.71812pt too wide) in paragraph at lines 597--608
  [][] 
  []
 
-<../eval_outputs/confusion_hard_pairs_resnet.png, id=240, 433.62pt x 361.35pt>
+<../eval_outputs/confusion_hard_pairs_resnet.png, id=238, 433.62pt x 361.35pt>
 File: ../eval_outputs/confusion_hard_pairs_resnet.png Graphic file (type png)
 <use ../eval_outputs/confusion_hard_pairs_resnet.png>
 Package pdftex.def Info: ../eval_outputs/confusion_hard_pairs_resnet.png  used 
-on input line 677.
+on input line 676.
 (pdftex.def)             Requested size: 120.95892pt x 100.79686pt.
-<../eval_outputs/confusion_hard_pairs_classical.png, id=242, 433.62pt x 361.35p
+<../eval_outputs/confusion_hard_pairs_classical.png, id=240, 433.62pt x 361.35p
 t>
 File: ../eval_outputs/confusion_hard_pairs_classical.png Graphic file (type png
 )
 <use ../eval_outputs/confusion_hard_pairs_classical.png>
 Package pdftex.def Info: ../eval_outputs/confusion_hard_pairs_classical.png  us
-ed on input line 681.
+ed on input line 680.
 (pdftex.def)             Requested size: 120.95892pt x 100.79686pt.
-<../eval_outputs/confusion_hard_pairs_sliq.png, id=243, 433.62pt x 361.35pt>
+<../eval_outputs/confusion_hard_pairs_sliq.png, id=241, 433.62pt x 361.35pt>
 File: ../eval_outputs/confusion_hard_pairs_sliq.png Graphic file (type png)
 <use ../eval_outputs/confusion_hard_pairs_sliq.png>
 Package pdftex.def Info: ../eval_outputs/confusion_hard_pairs_sliq.png  used on
- input line 685.
+ input line 684.
 (pdftex.def)             Requested size: 120.95892pt x 100.79686pt.
-<../eval_outputs/confusion_hard_pairs_quantum.png, id=244, 433.62pt x 361.35pt>
+<../eval_outputs/confusion_hard_pairs_quantum.png, id=242, 433.62pt x 361.35pt>
 
 File: ../eval_outputs/confusion_hard_pairs_quantum.png Graphic file (type png)
 <use ../eval_outputs/confusion_hard_pairs_quantum.png>
 Package pdftex.def Info: ../eval_outputs/confusion_hard_pairs_quantum.png  used
- on input line 689.
+ on input line 688.
 (pdftex.def)             Requested size: 120.95892pt x 100.79686pt.
-<../eval_outputs/grad_norms_quantum.png, id=248, 578.16pt x 289.08pt>
+<../eval_outputs/grad_norms_quantum.png, id=246, 578.16pt x 289.08pt>
 File: ../eval_outputs/grad_norms_quantum.png Graphic file (type png)
 <use ../eval_outputs/grad_norms_quantum.png>
 Package pdftex.def Info: ../eval_outputs/grad_norms_quantum.png  used on input 
-line 713.
+line 712.
 (pdftex.def)             Requested size: 120.95892pt x 60.47922pt.
-<../eval_outputs/grad_norms_sliq.png, id=249, 578.16pt x 289.08pt>
+<../eval_outputs/grad_norms_sliq.png, id=247, 578.16pt x 289.08pt>
 File: ../eval_outputs/grad_norms_sliq.png Graphic file (type png)
 <use ../eval_outputs/grad_norms_sliq.png>
 Package pdftex.def Info: ../eval_outputs/grad_norms_sliq.png  used on input lin
-e 717.
+e 716.
 (pdftex.def)             Requested size: 120.95892pt x 60.47922pt.
 [4]
-Underfull \hbox (badness 1442) in paragraph at lines 791--808
+Underfull \hbox (badness 1442) in paragraph at lines 790--807
 \OT1/ptm/m/n/10 ing ar-chi-tec-ture for plan-e-tary ter-rain im-age re-trieval.
  A
  []
@@ -1186,9 +1186,9 @@ tmb8a.pfb><C:/Users/Krishaay/AppData/Local/Programs/MiKTeX/fonts/type1/urw/time
 s/utmbi8a.pfb><C:/Users/Krishaay/AppData/Local/Programs/MiKTeX/fonts/type1/urw/
 times/utmr8a.pfb><C:/Users/Krishaay/AppData/Local/Programs/MiKTeX/fonts/type1/u
 rw/times/utmri8a.pfb>
-Output written on main.pdf (6 pages, 655228 bytes).
+Output written on main.pdf (6 pages, 654543 bytes).
 PDF statistics:
- 429 PDF objects out of 1000 (max. 8388607)
+ 427 PDF objects out of 1000 (max. 8388607)
  72 named destinations out of 1000 (max. 500000)
  251 words of extra memory for PDF output out of 10000 (max. 10000000)
 
