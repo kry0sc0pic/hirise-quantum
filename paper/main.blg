@@ -10,49 +10,55 @@ Reallocating 'singl_function' (item size: 4) to 100 items.
 Reallocating 'wiz_functions' (item size: 4) to 6000 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
 Database file #1: references.bib
+You're missing a field name---line 255 of file references.bib
+ : 
+ : %  author       = {{Anthropic}},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
 -- IEEEtran.bst version 1.14 (2015/08/26) by Michael Shell.
 -- http://www.michaelshell.org/tex/ieeetran/bibtex/
 -- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
 
 Done.
-You've used 22 entries,
+You've used 21 entries,
             4087 wiz_defined-function locations,
-            942 strings with 11929 characters,
-and the built_in function-call counts, 17699 in all, are:
-= -- 1353
-> -- 539
+            937 strings with 11835 characters,
+and the built_in function-call counts, 17344 in all, are:
+= -- 1324
+> -- 535
 < -- 118
-+ -- 287
-- -- 114
-* -- 845
-:= -- 2519
-add.period$ -- 48
-call.type$ -- 22
-change.case$ -- 24
++ -- 285
+- -- 113
+* -- 835
+:= -- 2454
+add.period$ -- 46
+call.type$ -- 21
+change.case$ -- 23
 chr.to.int$ -- 264
-cite$ -- 22
-duplicate$ -- 1291
-empty$ -- 1454
-format.name$ -- 128
-if$ -- 4153
+cite$ -- 21
+duplicate$ -- 1260
+empty$ -- 1417
+format.name$ -- 127
+if$ -- 4073
 int.to.chr$ -- 0
-int.to.str$ -- 22
-missing$ -- 256
-newline$ -- 91
-num.names$ -- 24
-pop$ -- 648
+int.to.str$ -- 21
+missing$ -- 249
+newline$ -- 88
+num.names$ -- 23
+pop$ -- 629
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 2
-skip$ -- 1368
+skip$ -- 1338
 stack$ -- 0
-substring$ -- 700
-swap$ -- 1027
+substring$ -- 699
+swap$ -- 1010
 text.length$ -- 30
 text.prefix$ -- 0
 top$ -- 5
-type$ -- 22
+type$ -- 21
 warning$ -- 0
-while$ -- 68
-width$ -- 24
-write$ -- 230
+while$ -- 67
+width$ -- 23
+write$ -- 222
+(There was 1 error message)

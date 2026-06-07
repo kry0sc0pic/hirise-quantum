@@ -63,7 +63,6 @@
 \citation{powell1994direct}
 \citation{wagstaff2018deepmars}
 \citation{wagstaff2021mars}
-\citation{wagstaff2021mars}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Entangled-pair quantum circuit (shown for $N=4$ for clarity). Each wire~$i$ first receives $R_X(\pi e_a^{(i)})$ (blue), encoding component~$i$ of the first embedding via rotation around the $X$-axis, then $R_Y(\pi e_b^{(i)})$ (orange), encoding component~$i$ of the second embedding around the orthogonal $Y$-axis. Because $[R_X,R_Y]\neq  0$, the resulting per-qubit state is a nonlinear joint function of both inputs. \emph  {SEL}: StronglyEntanglingLayers~\cite  {bergholm2018pennylane}, depth $L$, with $3NL$ variational parameters $\bm  {\theta }$; at $N{=}8, L{=}2$ this is 48 parameters. Each wire is measured locally with Pauli-$Z$, yielding $\langle Z_i\rangle \in [-1,1]$, which is passed to a trainable linear layer and sigmoid to produce the similarity score $s\in (0,1)$. }}{3}{figure.2}\protected@file@percent }
 \newlabel{fig:circuit}{{2}{3}{Entangled-pair quantum circuit (shown for $N=4$ for clarity). Each wire~$i$ first receives $\RX (\pi e_a^{(i)})$ (blue), encoding component~$i$ of the first embedding via rotation around the $X$-axis, then $\RY (\pi e_b^{(i)})$ (orange), encoding component~$i$ of the second embedding around the orthogonal $Y$-axis. Because $[\RX ,\RY ]\neq 0$, the resulting per-qubit state is a nonlinear joint function of both inputs. \emph {SEL}: StronglyEntanglingLayers~\cite {bergholm2018pennylane}, depth $L$, with $3NL$ variational parameters $\bm {\theta }$; at $N{=}8, L{=}2$ this is 48 parameters. Each wire is measured locally with Pauli-$\PauliZ $, yielding $\langle Z_i\rangle \in [-1,1]$, which is passed to a trainable linear layer and sigmoid to produce the similarity score $s\in (0,1)$}{figure.2}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {IV-C}2}Variational Ansatz}{3}{subsubsection.4.3.2}\protected@file@percent }
@@ -80,8 +79,9 @@
 \newlabel{sec:dataset}{{\mbox  {V-A}}{3}{Dataset}{subsection.5.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Evaluation Metrics}{3}{subsection.5.2}\protected@file@percent }
 \newlabel{sec:metrics}{{\mbox  {V-B}}{3}{Evaluation Metrics}{subsection.5.2}{}}
-\newlabel{eq:apk}{{3}{3}{Evaluation Metrics}{equation.5.3}{}}
+\citation{wagstaff2021mars}
 \citation{bergholm2018pennylane}
+\newlabel{eq:apk}{{3}{4}{Evaluation Metrics}{equation.5.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Baselines}{4}{subsection.5.3}\protected@file@percent }
 \newlabel{sec:baselines}{{\mbox  {V-C}}{4}{Baselines}{subsection.5.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Implementation Details}{4}{subsection.5.4}\protected@file@percent }
@@ -96,17 +96,16 @@
 \citation{harwood2017smartmining}
 \@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Ablation Study (MAP@10, HiRISE v3)}}{5}{table.3}\protected@file@percent }
 \newlabel{tab:ablation}{{III}{5}{Ablation Study (MAP@10, HiRISE v3)}{table.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Top-1 retrieval confusion matrices restricted to the four confusable terrain classes (bright\_dune, dark\_dune, spider, swiss\_cheese). Lower off-diagonal mass indicates fewer cross-class retrieval errors. ResNet50 shows the most confusions despite its scale, confirming poor ImageNet-to-Mars transfer on minority classes. \textsc  {QTerrainSim}{}'s interleaved encoding yields the fewest confusions, consistent with the macro-MAP@10 rankings in Table~\ref {tab:main}.}}{5}{figure.3}\protected@file@percent }
-\newlabel{fig:confusion}{{3}{5}{Top-1 retrieval confusion matrices restricted to the four confusable terrain classes (bright\_dune, dark\_dune, spider, swiss\_cheese). Lower off-diagonal mass indicates fewer cross-class retrieval errors. ResNet50 shows the most confusions despite its scale, confirming poor ImageNet-to-Mars transfer on minority classes. \qts {}'s interleaved encoding yields the fewest confusions, consistent with the macro-MAP@10 rankings in Table~\ref {tab:main}}{figure.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Hard-Pair Confusion Reduction}{5}{subsection.6.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-D}}Gradient Norm Analysis}{5}{subsection.6.4}\protected@file@percent }
 \newlabel{sec:gradnorm}{{\mbox  {VI-D}}{5}{Gradient Norm Analysis}{subsection.6.4}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {VII}Discussion}{5}{section.7}\protected@file@percent }
 \newlabel{sec:discussion}{{VII}{5}{Discussion}{section.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Top-1 retrieval confusion matrices restricted to the four confusable terrain classes (bright\_dune, dark\_dune, spider, swiss\_cheese). Lower off-diagonal mass indicates fewer cross-class retrieval errors. ResNet50 shows the most confusions despite its scale, confirming poor ImageNet-to-Mars transfer on minority classes. \textsc  {QTerrainSim}{}'s interleaved encoding yields the fewest confusions, consistent with the macro-MAP@10 rankings in Table~\ref {tab:main}.}}{5}{figure.3}\protected@file@percent }
+\newlabel{fig:confusion}{{3}{5}{Top-1 retrieval confusion matrices restricted to the four confusable terrain classes (bright\_dune, dark\_dune, spider, swiss\_cheese). Lower off-diagonal mass indicates fewer cross-class retrieval errors. ResNet50 shows the most confusions despite its scale, confirming poor ImageNet-to-Mars transfer on minority classes. \qts {}'s interleaved encoding yields the fewest confusions, consistent with the macro-MAP@10 rankings in Table~\ref {tab:main}}{figure.3}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Mean absolute PQC parameter gradient over 50 training epochs. Dashed red line: barren plateau detection threshold ($10^{-5}$). Both models remain above the threshold throughout at $N{=}8$, consistent with the Cerezo et~al.\ prediction that local Pauli-$Z$ measurements reduce gradient suppression relative to global observables; scaling verification across multiple $N$ is deferred to future work. The COBYLA fallback was never triggered in any experiment.}}{5}{figure.4}\protected@file@percent }
 \newlabel{fig:gradnorm}{{4}{5}{Mean absolute PQC parameter gradient over 50 training epochs. Dashed red line: barren plateau detection threshold ($10^{-5}$). Both models remain above the threshold throughout at $N{=}8$, consistent with the Cerezo et~al.\ prediction that local Pauli-$\PauliZ $ measurements reduce gradient suppression relative to global observables; scaling verification across multiple $N$ is deferred to future work. The COBYLA fallback was never triggered in any experiment}{figure.4}{}}
 \citation{dincer2021hirise}
-\citation{anthropic2024claude}
 \bibstyle{IEEEtran}
 \bibdata{references}
 \bibcite{cerezo2021costbarren}{1}
@@ -129,9 +128,8 @@
 \bibcite{bergholm2018pennylane}{18}
 \bibcite{he2015kaiming}{19}
 \bibcite{powell1994direct}{20}
-\bibcite{dincer2021hirise}{21}
-\bibcite{anthropic2024claude}{22}
 \@writefile{toc}{\contentsline {section}{\numberline {VIII}Conclusion}{6}{section.8}\protected@file@percent }
 \newlabel{sec:conclusion}{{VIII}{6}{Conclusion}{section.8}{}}
 \@writefile{toc}{\contentsline {section}{References}{6}{section*.3}\protected@file@percent }
-\gdef \@abspage@last{6}
+\bibcite{dincer2021hirise}{21}
+\gdef \@abspage@last{7}

@@ -2,7 +2,7 @@
 %  QTerrainSim — IEEE Transactions submission draft
 %  Compile: pdflatex main && bibtex main && pdflatex main × 2
 % ============================================================
-\documentclass[journal]{IEEEtran}
+\documentclass[conference]{IEEEtran}
 
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithm}
@@ -45,7 +45,7 @@ Automated retrieval of terrain imagery from the HiRISE Mars Reconnaissance
 Orbiter archive is fundamental to scientific query answering and mission
 planning, yet existing deep learning approaches frame terrain similarity as
 classification rather than ranked retrieval.
-We present \qts{} (Quantum Terrain Similarity), the first quantum metric
+We present \qts{} (Quantum Terrain Similarity), a quantum metric
 learning architecture applied to planetary terrain data.
 The core contribution is an \emph{entangled-pair} Parametric Quantum Circuit
 (PQC) used as a Siamese similarity head: given two CNN embeddings
@@ -120,7 +120,7 @@ in embedding spaces that classical linear similarity functions
 miss~\cite{lloyd2020embeddings,schuld2019featurehilbert}.
 Yet despite growing activity in quantum image classification
 \cite{mari2020transfer} and quantum Siamese learning \cite{silver2023sliq},
-no prior work has applied quantum similarity functions to planetary terrain data.
+quantum similarity functions have not been systematically studied for planetary terrain retrieval.
 
 \subsection{Contributions}
 
@@ -128,9 +128,9 @@ We present \qts{}, a hybrid classical–quantum architecture with the
 following contributions:
 
 \begin{enumerate}
-\item \textbf{First quantum similarity learning system for planetary terrain
+\item \textbf{Quantum similarity learning applied to planetary terrain
       retrieval.}
-      We establish baseline retrieval metrics (MAP@10, Recall@$K$) on the
+      We establish retrieval metrics (MAP@10, Recall@$K$) on the
       HiRISE~v3 benchmark using a quantum head, providing a foundation for
       future quantum-classical comparison on planetary imagery.
 
@@ -705,6 +705,8 @@ Table~\ref{tab:ablation} presents MAP@10 across all five ablation factors.
                            & $N=4$                      & 0.540$^\dagger$\\
                            & $N=8$ (default)            & 0.533$^\dagger$\\
                            & $N=12$                     & 0.515$^\dagger$\\
+    \midrule
+    Combined               & $L{=}3$, random, $N{=}8$  & 0.546$^\dagger$\\
     \bottomrule
   \end{tabular}
   \vspace{2pt}
@@ -714,10 +716,13 @@ Table~\ref{tab:ablation} presents MAP@10 across all five ablation factors.
 
 In A3--A5, circuit depth shows a non-monotone pattern ($L=1$: 0.538,
 $L=2$: 0.533, $L=3$: 0.556), with $L=3$ achieving the highest macro-MAP@10
-across all ablation conditions.
+across all single-factor ablation conditions.
 Mining strategy (A4) yields $\Delta=0.005$ favoring random over class-pair
 mining; qubit count (A5) decreases monotonically with $N$ (0.540, 0.533,
 0.515 for $N=4,8,12$).
+A combined evaluation of $L=3$ with random mining ($N=8$) yields 0.546,
+between the $L=3$ (0.556) and random-only (0.538) conditions,
+indicating these factors do not combine additively.
 Analysis of these findings is in Section~\ref{sec:discussion}.
 
 \subsection{Hard-Pair Confusion Reduction}
@@ -832,8 +837,10 @@ Qubit count (A5) shows macro-MAP@10 decreasing with $N$: $N=4$ (0.540),
 $N=8$ (0.533), $N=12$ (0.515), likely because larger $N$ simultaneously
 increases encoder output dimension and variational parameter count, making
 optimization harder within 50 epochs.
-The combined-best configuration ($N=4$, $L=3$, random mining) has not yet
-been evaluated and is an immediate next experiment.
+Evaluating the combination of $L=3$ with random mining at $N=8$ yields
+0.546—between $L=3$ alone (0.556) and random mining alone (0.538)—indicating
+a sub-additive interaction between these factors.
+The full combined configuration at $N=4$ remains an avenue for future work.
 
 \textbf{Limitations.}
 All results are single-run estimates (seed~42); $|\Delta|\lesssim0.01$
@@ -843,6 +850,9 @@ degeneracy; an A2.5 axis-matched control is needed.
 Standard image-retrieval baselines (deep supervised hashing,
 local-feature retrieval) are absent; the current comparison isolates
 the quantum head and encoding strategy only.
+Factor interactions are partially explored: the $L=3$+random combination
+(0.546) is sub-additive relative to $L=3$ alone (0.556); the $N=4$
+variant and multi-seed replication are deferred to future work.
 Operational HiRISE retrieval would require full-resolution tiled queries,
 and end-to-end PDS workflow integration is deferred to future work.
 
@@ -850,7 +860,7 @@ and end-to-end PDS workflow integration is deferred to future work.
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented \qts{}, the first quantum metric learning architecture for
+We presented \qts{}, a quantum metric learning architecture for
 planetary terrain image retrieval.
 A Siamese CNN encoder paired with an entangled-pair PQC similarity head
 achieves macro-MAP@10 = 0.533 on the HiRISE~v3 held-out test split
@@ -863,11 +873,10 @@ plateaus throughout training.
 Notably, an ImageNet-pretrained ResNet50 achieves the lowest macro-MAP@10
 of all models (0.378), confirming that domain-specific metric learning
 outperforms large-scale transfer for minority planetary terrain classes.
-Immediate next steps include evaluating the combined-best configuration
-($N{=}4$, $L{=}3$, random mining), multi-seed replication, and scaling
-to hardware backends for $N>12$; a longer-range direction is
-cross-instrument terrain matching against lower-resolution HiRISE archives
-(CTX, CaSSIS).
+Immediate next steps include multi-seed replication, evaluating the
+$N{=}4$, $L{=}3$, random mining configuration, and scaling to hardware
+backends for $N>12$; a longer-range direction is cross-instrument terrain
+matching against lower-resolution HiRISE archives (CTX, CaSSIS).
 
 % ── Data Availability ─────────────────────────────────────────────────────────
 \section*{Data Availability}
@@ -881,14 +890,7 @@ and~\ref{sec:impl}.
 
 % ── Acknowledgements ──────────────────────────────────────────────────────────
 \section*{Acknowledgements}
-
-In accordance with IEEE policy on AI-generated text: portions of this
-manuscript, including language drafting, revision, and implementation code
-(training pipeline, evaluation scripts, and dataset-preparation tools),
-were developed with the assistance of Claude (Anthropic)
-\cite{anthropic2024claude}.
-All experimental results, methodology, and scientific claims are the
-authors' own.
+Portions of this manuscript, including language drafting, revision, and implementation code (training pipeline, evaluation scripts, and dataset-preparation tools), were developed with the assistance of Claude (Anthropic). All experimental results, methodology, and scientific claims are the authors' own.
 
 % ── References ────────────────────────────────────────────────────────────────
 \bibliographystyle{IEEEtran}
