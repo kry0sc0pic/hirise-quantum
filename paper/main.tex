@@ -1,5 +1,5 @@
 % ============================================================
-%  QTerrainSim — IEEE Transactions submission draft
+%  QTerrainSim — IEEE conference submission draft
 %  Compile: pdflatex main && bibtex main && pdflatex main × 2
 % ============================================================
 \documentclass[conference]{IEEEtran}
@@ -25,8 +25,6 @@
 \newcommand{\RY}{R_Y}
 \newcommand{\RZ}{R_Z}
 \newcommand{\PauliZ}{Z}
-% Placeholder for missing experimental numbers
-\newcommand{\res}[1]{\textcolor{red}{\textbf{[#1]}}}
 
 % ============================================================
 \begin{document}
@@ -345,7 +343,7 @@ Ablation A2 quantifies the retrieval gap from this difference.
 \subsubsection{Variational Ansatz}
 
 Following the encoding layer, $L$ StronglyEntanglingLayers~\cite{bergholm2018pennylane}
-are applied ($\RZ$-$\RY$-$\RZ$ rotations with CZ entangling gates);
+are applied ($\RZ$-$\RY$-$\RZ$ rotations with CNOT entangling gates);
 at $N{=}8$, $L{=}2$, the ansatz has $3NL=48$ parameters
 $\bm{\theta}\in\mathbb{R}^{48}$.
 
@@ -590,7 +588,7 @@ This asymmetry indicates that the encoding strategy—interleaved
 $\RX$/$\RY$ per qubit versus SLIQ's sequential $\RZ$/$\RX$ blocks—is the
 dominant factor for minority-class retrieval, while the quantum circuit
 itself provides only a marginal advantage over an equivalently parameterized
-classical MLP on aggregate micro-MAP.
+classical MLP on both micro- and macro-MAP.
 
 \begin{table}[t]
   \centering
@@ -753,8 +751,8 @@ ResNet50's poor macro-MAP@10 (0.378) reflects a domain gap: overhead
 grayscale geomorphic patches share little with ImageNet's color-texture
 prior, and the 83.6\% ``other'' class means micro-MAP@10 ($>$0.82 for all
 models) masks the full spread.
-Macro-MAP@10 reveals the true picture: a 1.7\,M-parameter domain-specific
-encoder outperforms the 23\,M-parameter baseline by 0.155.
+Macro-MAP@10 reveals the true picture: a ${\sim}2.1\,$M-parameter domain-specific
+encoder outperforms the ${\sim}23\,$M-parameter baseline by 0.155.
 Future work should explore stratified triplet construction or
 embedding-proximity mining~\cite{harwood2017smartmining} to further reduce
 class-frequency bias.
