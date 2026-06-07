@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.10.14)  7 JUN 2026 09:15
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.10.14)  7 JUN 2026 09:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1141,17 +1141,13 @@ Before submitting the final camera ready copy, remember to:
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 97875F7B13C205067A7509B972B1BABA;3664.
  ) 
 Here is how much of TeX's memory you used:
  27309 strings out of 474486
- 541566 string characters out of 5742338
- 1986542 words of memory out of 5000000
+ 541566 string characters out of 11992338
+ 3924542 words of memory out of 7000000
  48993 multiletter control sequences out of 15000+600000
  614493 words of font info for 145 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
