@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.10.14)  7 JUN 2026 09:02
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.10.14)  7 JUN 2026 09:15
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1012,8 +1012,23 @@ Package hyperref Info: Link coloring ON on input line 32.
 \openout4 = `main.out'.
 
 
-Underfull \hbox (badness 2221) in paragraph at lines 132--136
+Underfull \hbox (badness 2221) in paragraph at lines 125--129
 []\OT1/ptm/b/n/10 Quantum sim-i-lar-ity learn-ing ap-plied to plan-e-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 143--147
+[]\OT1/ptm/b/n/10 Domain-specific hard neg-a-tive min-ing.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 143--147
+\OT1/ptm/m/n/10 Neg-a-tives tar-get ge-o-log-i-cally con-fus-able pairs
+ []
+
+
+Underfull \hbox (badness 3601) in paragraph at lines 143--147
+\OT1/ptm/m/n/10 by pixel-space class-mean sim-i-lar-ity; ab-la-tion A4
  []
 
 [1{C:/Users/Krishaay/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users
@@ -1021,26 +1036,12 @@ Underfull \hbox (badness 2221) in paragraph at lines 132--136
 
 
 ] [2]
-Overfull \hbox (37.51501pt too wide) in paragraph at lines 424--439
+Overfull \hbox (37.51501pt too wide) in paragraph at lines 398--413
  [][] 
  []
 
-LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 4
-82.
-(C:\Program Files\MiKTeX\tex/latex/psnfss\ot1pcr.fd
-File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
-)
-Underfull \hbox (badness 10000) in paragraph at lines 480--488
-\OT1/ptm/m/n/10 by sim-u-la-tion mem-ory), us-ing a strat-i-fied 70/15/15
- []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 480--488
-\OT1/ptm/m/n/10 train/val/test split (per-class, seed 42) gen-er-ated by
- []
-
-
-Overfull \hbox (9.32895pt too wide) detected at line 544
+Overfull \hbox (9.32895pt too wide) detected at line 504
 [][][][]\OT1/cmr/m/n/10 @\OML/cmm/m/it/10 K\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 q\
 OT1/cmr/m/n/10 ) = [] [] \OML/cmm/m/it/10 P\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 k\
 OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 ^^A \OT1/cmr/bx/n/10 1\OT1/cmr/m/n/10 [[]\OML
@@ -1048,60 +1049,80 @@ OT1/cmr/m/n/10 ) \OMS/cmsy/m/n/10 ^^A \OT1/cmr/bx/n/10 1\OT1/cmr/m/n/10 [[]\OML
  []
 
 [3]
-Overfull \hbox (5.71812pt too wide) in paragraph at lines 658--669
+LaTeX Font Info:    Trying to load font information for OT1+pcr on input line 5
+46.
+ (C:\Program Files\MiKTeX\tex/latex/psnfss\ot1pcr.fd
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+)
+Underfull \hbox (badness 10000) in paragraph at lines 554--560
+[]\OT1/ptm/b/n/10 ResNet50 base-line. \OT1/ptm/m/n/10 ImageNet-pretrained back-
+bone;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 554--560
+\OT1/ptm/m/n/10 grayscale repli-cated to 3 chan-nels (no first-layer
+ []
+
+
+Underfull \hbox (badness 5741) in paragraph at lines 554--560
+\OT1/ptm/m/n/10 reini-tial-iza-tion); fine-tuned end-to-end with triplet loss
+ []
+
+
+Overfull \hbox (5.71812pt too wide) in paragraph at lines 600--611
  [][] 
  []
 
-[4]
-<../eval_outputs/confusion_hard_pairs_resnet.png, id=248, 433.62pt x 361.35pt>
+<../eval_outputs/confusion_hard_pairs_resnet.png, id=240, 433.62pt x 361.35pt>
 File: ../eval_outputs/confusion_hard_pairs_resnet.png Graphic file (type png)
 <use ../eval_outputs/confusion_hard_pairs_resnet.png>
 Package pdftex.def Info: ../eval_outputs/confusion_hard_pairs_resnet.png  used 
-on input line 737.
+on input line 679.
 (pdftex.def)             Requested size: 120.95892pt x 100.79686pt.
-<../eval_outputs/confusion_hard_pairs_classical.png, id=250, 433.62pt x 361.35p
+<../eval_outputs/confusion_hard_pairs_classical.png, id=242, 433.62pt x 361.35p
 t>
 File: ../eval_outputs/confusion_hard_pairs_classical.png Graphic file (type png
 )
 <use ../eval_outputs/confusion_hard_pairs_classical.png>
 Package pdftex.def Info: ../eval_outputs/confusion_hard_pairs_classical.png  us
-ed on input line 741.
+ed on input line 683.
 (pdftex.def)             Requested size: 120.95892pt x 100.79686pt.
-<../eval_outputs/confusion_hard_pairs_sliq.png, id=251, 433.62pt x 361.35pt>
+<../eval_outputs/confusion_hard_pairs_sliq.png, id=243, 433.62pt x 361.35pt>
 File: ../eval_outputs/confusion_hard_pairs_sliq.png Graphic file (type png)
 <use ../eval_outputs/confusion_hard_pairs_sliq.png>
 Package pdftex.def Info: ../eval_outputs/confusion_hard_pairs_sliq.png  used on
- input line 745.
+ input line 687.
 (pdftex.def)             Requested size: 120.95892pt x 100.79686pt.
-<../eval_outputs/confusion_hard_pairs_quantum.png, id=252, 433.62pt x 361.35pt>
+<../eval_outputs/confusion_hard_pairs_quantum.png, id=244, 433.62pt x 361.35pt>
 
 File: ../eval_outputs/confusion_hard_pairs_quantum.png Graphic file (type png)
 <use ../eval_outputs/confusion_hard_pairs_quantum.png>
 Package pdftex.def Info: ../eval_outputs/confusion_hard_pairs_quantum.png  used
- on input line 749.
+ on input line 691.
 (pdftex.def)             Requested size: 120.95892pt x 100.79686pt.
-<../eval_outputs/grad_norms_quantum.png, id=256, 578.16pt x 289.08pt>
+<../eval_outputs/grad_norms_quantum.png, id=248, 578.16pt x 289.08pt>
 File: ../eval_outputs/grad_norms_quantum.png Graphic file (type png)
 <use ../eval_outputs/grad_norms_quantum.png>
 Package pdftex.def Info: ../eval_outputs/grad_norms_quantum.png  used on input 
-line 773.
+line 715.
 (pdftex.def)             Requested size: 120.95892pt x 60.47922pt.
-<../eval_outputs/grad_norms_sliq.png, id=257, 578.16pt x 289.08pt>
+<../eval_outputs/grad_norms_sliq.png, id=249, 578.16pt x 289.08pt>
 File: ../eval_outputs/grad_norms_sliq.png Graphic file (type png)
 <use ../eval_outputs/grad_norms_sliq.png>
 Package pdftex.def Info: ../eval_outputs/grad_norms_sliq.png  used on input lin
-e 777.
+e 719.
 (pdftex.def)             Requested size: 120.95892pt x 60.47922pt.
- [5 <../eval_outputs/confusion_hard_pairs_resnet.png> <../eval_outputs/confusio
-n_hard_pairs_classical.png> <../eval_outputs/confusion_hard_pairs_sliq.png> <..
-/eval_outputs/confusion_hard_pairs_quantum.png> <../eval_outputs/grad_norms_qua
-ntum.png> <../eval_outputs/grad_norms_sliq.png>]
-Underfull \hbox (badness 1442) in paragraph at lines 863--880
+[4]
+Underfull \hbox (badness 1442) in paragraph at lines 793--810
 \OT1/ptm/m/n/10 ing ar-chi-tec-ture for plan-e-tary ter-rain im-age re-trieval.
  A
  []
 
-(main.bbl [6])
+(main.bbl [5 <../eval_outputs/confusion_hard_pairs_resnet.png> <../eval_outputs
+/confusion_hard_pairs_classical.png> <../eval_outputs/confusion_hard_pairs_sliq
+.png> <../eval_outputs/confusion_hard_pairs_quantum.png> <../eval_outputs/grad_
+norms_quantum.png> <../eval_outputs/grad_norms_sliq.png>])
 
 ** Conference Paper **
 Before submitting the final camera ready copy, remember to:
@@ -1113,19 +1134,23 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[7
+[6
 
 ] (main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
  ***********
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 97875F7B13C205067A7509B972B1BABA;3664.
  ) 
 Here is how much of TeX's memory you used:
- 27310 strings out of 474486
- 541572 string characters out of 5742338
+ 27309 strings out of 474486
+ 541566 string characters out of 5742338
  1986542 words of memory out of 5000000
  48993 multiletter control sequences out of 15000+600000
  614493 words of font info for 145 fonts, out of 8000000 for 9000
@@ -1167,9 +1192,9 @@ tmb8a.pfb><C:/Users/Krishaay/AppData/Local/Programs/MiKTeX/fonts/type1/urw/time
 s/utmbi8a.pfb><C:/Users/Krishaay/AppData/Local/Programs/MiKTeX/fonts/type1/urw/
 times/utmr8a.pfb><C:/Users/Krishaay/AppData/Local/Programs/MiKTeX/fonts/type1/u
 rw/times/utmri8a.pfb>
-Output written on main.pdf (7 pages, 662041 bytes).
+Output written on main.pdf (6 pages, 654340 bytes).
 PDF statistics:
- 432 PDF objects out of 1000 (max. 8388607)
- 72 named destinations out of 1000 (max. 500000)
+ 426 PDF objects out of 1000 (max. 8388607)
+ 71 named destinations out of 1000 (max. 500000)
  251 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -102,25 +102,18 @@ corridor''), and change detection across orbital timesteps.
 Retrieval requires learning a \emph{similarity function}, not a class
 boundary.
 
-The challenge is that the HiRISE class taxonomy reflects expert geological
-labeling conventions that are imperfectly aligned with image-space
-appearance.
-Bright dunes and dark dunes are compositionally distinct but geometrically
-similar; spider formations and swiss cheese texture are visually confusable
-at small patch scales.
-A useful similarity function must resolve these fine-grained distinctions
-in a principled way.
-
 Quantum metric learning offers a structurally motivated approach to this
-problem.
-Quantum circuits naturally express correlations between feature dimensions
-that are exponentially expensive to represent classically, and pairwise
-quantum similarity measures have been shown to capture geometric structure
-in embedding spaces that classical linear similarity functions
-miss~\cite{lloyd2020embeddings,schuld2019featurehilbert}.
+problem: circuits naturally express inter-feature correlations that are
+exponentially expensive to represent classically, and pairwise quantum
+similarity measures capture geometric structure missed by linear functions~\cite{lloyd2020embeddings,schuld2019featurehilbert}.
+The domain also poses a fine-grained challenge—bright and dark dunes are
+compositionally distinct but geometrically similar; spider and swiss\_cheese
+formations are visually confusable at patch scale—demanding a similarity
+function that resolves these distinctions.
 Yet despite growing activity in quantum image classification
 \cite{mari2020transfer} and quantum Siamese learning \cite{silver2023sliq},
-quantum similarity functions have not been systematically studied for planetary terrain retrieval.
+quantum similarity functions have not been systematically studied for
+planetary terrain retrieval.
 
 \subsection{Contributions}
 
@@ -136,35 +129,25 @@ following contributions:
 
 \item \textbf{Entangled-pair encoding via interleaved \boldmath$\RX$/$\RY$
       rotations.}
-      On each qubit~$i$, we apply $\RX(\pi e_a^{(i)})$ then
-      $\RY(\pi e_b^{(i)})$ to jointly encode both embeddings via
-      non-commuting rotations on orthogonal Bloch-sphere axes.
-      Because $[\RX, \RY] \neq 0$, the resulting per-qubit state is a
-      nonlinear joint function of both embeddings—not a sum of independent
-      contributions—and the subsequent entangling ansatz therefore operates
-      on qubits already conditioned on both inputs simultaneously.
-      This contrasts with the sequential encoding used in SLIQ
-      \cite{silver2023sliq}, which encodes $\mathbf{e}_a$ and
-      $\mathbf{e}_b$ in separate rotation blocks.
+      On each qubit~$i$, $\RX(\pi e_a^{(i)})$ then $\RY(\pi e_b^{(i)})$
+      jointly encode both embeddings via non-commuting rotations; the
+      $[\RX,\RY]\neq0$ nonlinearity produces a per-qubit state that is a
+      nonlinear joint function of both inputs, contrasted with SLIQ's
+      sequential encoding blocks~\cite{silver2023sliq}.
 
 \item \textbf{Barren plateau mitigation via local observables.}
-      We measure each wire individually with Pauli-$\PauliZ$ observables
-      rather than a single global measurement.
-      Following Cerezo et~al.~\cite{cerezo2021costbarren}, we observe
-      empirically that quantum layer gradients remain above the vanishing
-      threshold throughout training at $N=8$, consistent with the
-      cost-function-dependent plateau prediction for shallow circuits.
+      Local Pauli-$\PauliZ$ measurements yield polynomial (vs.\ exponential)
+      gradient decay with system size~\cite{cerezo2021costbarren}; no
+      plateau fallback was triggered at $N=8$.
 
 \item \textbf{Domain-specific hard negative mining.}
-      We identify the geologically motivated confusable class pairs via
-      pixel-space cosine similarity of per-class mean images and direct
-      50\% of negative sampling toward these pairs.
-      Ablation A4 isolates the contribution of this strategy.
+      Negatives target geologically confusable pairs (bright\_dune/dark\_dune,
+      spider/swiss\_cheese) identified by pixel-space class-mean similarity;
+      ablation A4 isolates the contribution.
 
 \item \textbf{Five-factor ablation.}
-      We systematically vary the similarity head type (A1), encoding
-      strategy (A2), circuit depth (A3), negative mining (A4), and qubit
-      count (A5), providing a controlled account of each design decision.
+      Varying head type (A1), encoding (A2), depth (A3), mining (A4), and
+      qubit count (A5) provides a controlled account of each design decision.
 \end{enumerate}
 
 
@@ -361,14 +344,10 @@ Ablation A2 quantifies the retrieval gap from this difference.
 
 \subsubsection{Variational Ansatz}
 
-Following the encoding layer, $L$ layers of StronglyEntanglingLayers
-\cite{bergholm2018pennylane} are applied.
-Each layer consists of parameterized $\RZ$-$\RY$-$\RZ$ single-qubit
-rotations on every wire, interleaved with a brick-layer pattern of
-controlled-Z (CZ) entangling gates between neighboring and
-periodically-shifted qubit pairs.
-With $N=8$, $L=2$, the ansatz has $3NL = 48$ parameters
-$\bm{\theta} \in \mathbb{R}^{48}$.
+Following the encoding layer, $L$ StronglyEntanglingLayers~\cite{bergholm2018pennylane}
+are applied ($\RZ$-$\RY$-$\RZ$ rotations with CZ entangling gates);
+at $N{=}8$, $L{=}2$, the ansatz has $3NL=48$ parameters
+$\bm{\theta}\in\mathbb{R}^{48}$.
 
 \subsubsection{Measurements and Barren Plateau Mitigation}
 
@@ -380,15 +359,10 @@ A trainable linear layer $\sigma(\mathbf{w}^\top\mathbf{f}+b)$ maps
 $\mathbf{f}$ to a scalar similarity score
 $s(\mathbf{x}_a,\mathbf{x}_b)\in(0,1)$.
 
-The use of $N$ local observables rather than a single global
-observable is motivated by Cerezo et~al.~\cite{cerezo2021costbarren},
-who prove that for $L=O(\log N)$-depth circuits, local cost gradients
-vanish at most polynomially in $N$, whereas global cost gradients vanish
-exponentially as $O(1/2^N)$.
-This is a qualitative distinction—not merely a quantitative gap at a
-specific $N$—since polynomial suppression allows gradients to remain
-informative as the system scales, while exponential suppression renders
-gradient-based optimization infeasible beyond small qubit counts.
+The use of $N$ local observables rather than a single global observable is
+motivated by Cerezo et~al.~\cite{cerezo2021costbarren}, who prove that
+local cost gradients vanish at most polynomially in $N$ for shallow circuits,
+whereas global cost gradients vanish exponentially as $O(1/2^N)$.
 
 Figure~\ref{fig:circuit} illustrates the complete circuit structure.
 
@@ -443,25 +417,14 @@ Figure~\ref{fig:circuit} illustrates the complete circuit structure.
 \subsection{Hard Negative Mining}
 \label{sec:mining}
 
-Random negative sampling tends to produce trivially dissimilar pairs
-(e.g., crater vs.\ spider), providing weak gradient signal
-\cite{harwood2017smartmining}.
-We adapt hard negative mining to the HiRISE domain as follows.
-
-Let $\mu_c = \mathbb{E}_{x\sim c}[\mathrm{vec}(x)] \in \mathbb{R}^{64^2}$
-be the mean image of class $c$.
-We compute the pairwise cosine similarity
-$\mathrm{sim}(c_1, c_2) = \mu_{c_1}^\top\mu_{c_2} / (\|\mu_{c_1}\|\|\mu_{c_2}\|)$
-between all class means and identify the two most confusable pairs:
-bright\_dune/dark\_dune and spider/swiss\_cheese.
-These pairs align with the persistent confusion reported in
-operational HiRISE deployment~\cite{wagstaff2021mars}.
-
-During triplet construction, 50\% of negatives are sampled uniformly from
-the confusable partner class of the anchor; the remaining 50\% are drawn
-uniformly at random from all other classes.
-Ablation A4 (Section~\ref{sec:ablation}) quantifies the contribution
-of this strategy.
+Random negative sampling produces trivially dissimilar pairs, giving weak
+gradient signal~\cite{harwood2017smartmining}.
+We identify the two most confusable class pairs by pixel-space class-mean
+cosine similarity: bright\_dune/dark\_dune and spider/swiss\_cheese,
+consistent with operational HiRISE confusion reports~\cite{wagstaff2021mars}.
+During triplet construction, 50\% of negatives are drawn from the confusable
+partner class; the remainder are random.
+Ablation A4 (Section~\ref{sec:ablation}) isolates this effect.
 
 \subsection{Training Procedure}
 \label{sec:training}
@@ -477,14 +440,11 @@ If mean absolute PQC gradient falls below $10^{-5}$ for five consecutive
 epochs, the quantum optimizer switches to COBYLA~\cite{powell1994direct};
 this fallback was not triggered in any reported experiment.
 
-Training runs for 50 epochs with batch size 16 (limited by simulation
-memory), using a stratified 70/15/15 train/val/test split
-(per-class, seed 42) generated by \texttt{scripts/make\_splits.py};
-paths are stored as POSIX-relative strings in JSON for cross-platform
-reproducibility.
-The checkpoint with the highest macro-MAP@10 on the held-out validation
-set (computed every 5 epochs via encoder cosine-similarity retrieval)
-is saved; the test split is reserved exclusively for final evaluation.
+Training runs for 50 epochs with batch size 16, using a stratified
+70/15/15 train/val/test split (per-class, seed 42).
+The checkpoint with the highest macro-MAP@10 on the validation set
+(evaluated every 5 epochs) is saved; the test split is held out until
+final evaluation.
 
 % ── 5. Experimental Setup ────────────────────────────────────────────────────
 \section{Experimental Setup}
@@ -587,27 +547,16 @@ All experiments are implemented in PyTorch 2.1 with PennyLane~0.45
 simulator and \texttt{diff\_method=``backprop''} for exact gradient
 computation (no shot noise).
 The \texttt{TorchLayer} interface wraps the \texttt{QNode} as a
-differentiable PyTorch module.
-A non-obvious implementation detail: PennyLane 0.45's \texttt{TorchLayer}
-passes the full batch tensor of shape $(B,2N)$ to the \texttt{QNode}, so
-embedding slices must be indexed as \texttt{inputs[\ldots,:N]} rather than
-\texttt{inputs[:N]}, which would slice batch rows.
-PennyLane's parameter broadcasting then propagates the batch through the
-circuit.
-All experiments run on CPU; statevector dimension $2^8=256$ fits
-comfortably in memory.
+differentiable PyTorch module; embedding slices use
+\texttt{inputs[\ldots,:N]} to preserve batch dimensions.
+All experiments run on CPU (statevector dimension $2^8{=}256$).
 
 \textbf{ResNet50 baseline.}
-The ResNet50 strong baseline uses an ImageNet-pretrained backbone with
-single-channel grayscale inputs replicated across three channels
-(no first-layer reinitialization).
-The backbone is fine-tuned end-to-end with triplet loss using Adam
-($\alpha_{\text{backbone}}=10^{-4}$, $\alpha_{\text{head}}=10^{-3}$).
-The embedding head is a single linear layer projecting from the
-2048-dimensional penultimate feature vector to $N=8$ dimensions with
-$\ell_2$ normalization, matching the \qts{} output space.
-Training runs for 50 epochs with the same batch size, split, and
-triplet construction as \qts{}.
+ImageNet-pretrained backbone; grayscale replicated to 3 channels
+(no first-layer reinitialization); fine-tuned end-to-end with triplet loss
+($\alpha_{\text{backbone}}{=}10^{-4}$, $\alpha_{\text{head}}{=}10^{-3}$);
+2048$\to N$ linear head with $\ell_2$ normalization; same 50-epoch schedule,
+batch size, and split as \qts{}.
 
 \textbf{Variance and replication.}
 All results in Tables~\ref{tab:main} and~\ref{tab:ablation} are produced
@@ -630,17 +579,10 @@ split for all four models.
 \qts{} achieves micro-MAP@10 = 0.879, macro-MAP@10 = 0.533,
 Recall@1 = 0.856, and Recall@5 = 0.951, ranking first on all metrics.
 
-The most striking result is the ResNet50 strong baseline: despite a
-${\sim}23\,\text{M}$-parameter ImageNet-pretrained backbone—orders of
-magnitude larger than any other model—it achieves the lowest macro-MAP@10
-of all four models (0.378).
-This confirms that ImageNet features do not transfer to minority Mars terrain
-classes (spider: 0.7\%, impact\_ejecta: 0.3\%): the fine-grained
-geomorphic distinctions visible in $64{\times}64$ grayscale HiRISE patches
-(e.g., CO\textsubscript{2}-sublimation texture versus aeolian bedform) are
-orthogonal to the color-texture statistics of natural-image pre-training.
-A lightweight domain-specific encoder trained end-to-end on triplet loss
-outperforms this large pre-trained model by 0.155 macro-MAP@10.
+Notably, ResNet50 achieves the lowest macro-MAP@10 (0.378) despite
+${\sim}23\,\text{M}$ ImageNet-pretrained parameters: overhead grayscale
+geomorphic structure is orthogonal to natural-image color-texture priors,
+and our domain-specific encoder outperforms it by 0.155 macro-MAP@10.
 
 The macro-MAP gap between \qts{} and SLIQ-style encoding ($\Delta = 0.061$)
 substantially exceeds the gap versus the classical head ($\Delta = 0.005$).
@@ -806,25 +748,16 @@ disentangle these factors and is an immediate priority for follow-up.
 The quantum-vs-classical head gap ($\Delta=0.005$, A1) is within typical
 seed-to-seed variance at a single run and is treated as directional only.
 
-\textbf{Transfer learning and domain specificity.}
-ResNet50 achieves the lowest macro-MAP@10 of all models (0.378), despite
-${\sim}23\,\text{M}$ ImageNet-pretrained parameters.
-The Mars terrain domain differs from ImageNet in channel (grayscale),
-viewpoint (overhead), structure (geomorphic), and severe class imbalance
-($<\!1\%$ minority classes)—none of which the ImageNet prior addresses.
-A 1.7\,M-parameter domain-specific encoder trained from scratch with
-triplet loss outperforms it by 0.155 macro-MAP@10, a strong empirical
-case for domain-specific metric learning on specialized planetary data.
-
-\textbf{Class imbalance.}
-The 83.6\% ``other'' class makes micro-MAP@10 a misleading primary metric;
-all four models score above 0.82, masking large minority-class differences.
-Macro-MAP@10 reveals a clearer picture: the A2 gap is 0.061 and the
-ResNet50 gap is 0.155.
-Future work should investigate stratified triplet construction that
-undersamples ``other'' or uses embedding-space proximity
-\cite{harwood2017smartmining} to select informative negatives independently
-of class frequency.
+\textbf{Domain specificity and class imbalance.}
+ResNet50's poor macro-MAP@10 (0.378) reflects a domain gap: overhead
+grayscale geomorphic patches share little with ImageNet's color-texture
+prior, and the 83.6\% ``other'' class means micro-MAP@10 ($>$0.82 for all
+models) masks the full spread.
+Macro-MAP@10 reveals the true picture: a 1.7\,M-parameter domain-specific
+encoder outperforms the 23\,M-parameter baseline by 0.155.
+Future work should explore stratified triplet construction or
+embedding-proximity mining~\cite{harwood2017smartmining} to further reduce
+class-frequency bias.
 
 \textbf{Ablation findings (A3--A5).}
 Circuit depth (A3) has a non-monotone effect: $L=3$ (0.556) outperforms
@@ -850,11 +783,8 @@ degeneracy; an A2.5 axis-matched control is needed.
 Standard image-retrieval baselines (deep supervised hashing,
 local-feature retrieval) are absent; the current comparison isolates
 the quantum head and encoding strategy only.
-Factor interactions are partially explored: the $L=3$+random combination
-(0.546) is sub-additive relative to $L=3$ alone (0.556); the $N=4$
-variant and multi-seed replication are deferred to future work.
 Operational HiRISE retrieval would require full-resolution tiled queries,
-and end-to-end PDS workflow integration is deferred to future work.
+and end-to-end PDS integration is deferred to future work.
 
 % ── 8. Conclusion ─────────────────────────────────────────────────────────────
 \section{Conclusion}
